@@ -12,3 +12,7 @@ Obsupport.2 PWA release — 2026-09-04
 - Added PDF manual links in the application.
 - docs/device-manual.pdf = 端末別利用マニュアル
 - docs/user-guide.pdf = Obsupport.2 使用説明書
+
+[2026-09-07 v9]
+- Manual PDFs updated: QR code and public URL corrected to https://masao172.github.io/obsupport/
+- Service worker cache name updated to force refresh of manual PDFs.
