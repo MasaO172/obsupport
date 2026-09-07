@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>肥満症 治療選択サポート</title>
+<style>
+:root{
+  --bg:#eef3f7; --card:#ffffff; --border:#d6e0e8; --text:#1f2937; --sub:#607286;
+  --primary:#165c8d; --primary-dk:#0c3d61; --primary-lt:#e8f2f9;
+  --ok:#047857; --ok-bg:#ecfdf5; --warn:#a16207; --warn-bg:#fffbeb;
+  --ng:#b42318; --ng-bg:#fff1f0; --info:#175cd3; --info-bg:#eff8ff;
+  --pending:#7c8797; --pending-bg:#f4f6f8;
+  --shadow:0 2px 10px rgba(30,55,75,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,
+  "Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif; background:var(--bg); color:var(--text);
+  line-height:1.6; -webkit-text-size-adjust:100%;
+}
+button,input,select{font:inherit}
+.wrap{max-width:920px;margin:0 auto;padding:24px 14px 60px}
+header{text-align:center;padding:10px 6px 18px}
+.badge{display:inline-block;background:var(--primary);color:#fff;padding:5px 13px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.08em}
+h1{font-size:clamp(25px,5vw,36px);line-height:1.2;margin:12px 0 7px;color:var(--primary-dk)}
+.subtitle{margin:0;color:var(--sub);font-size:14px}
+.version{display:inline-block;margin-top:9px;color:var(--sub);font-size:11px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:20px;margin:0 0 14px;box-shadow:var(--shadow)}
+.card-hd{display:flex;align-items:center;gap:9px;color:var(--primary);font-size:13px;font-weight:800;letter-spacing:.06em;margin-bottom:15px}
+.card-hd:after{content:"";height:1px;background:var(--border);flex:1}
+.section-title{font-size:15px;font-weight:800;color:var(--primary-dk);margin:18px 0 9px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+label,.label{font-size:13px;font-weight:650;color:#52677b}
+.req{color:var(--ng)}
+.input-wrap{position:relative}
+input[type=number],input[type=date],select{
+  width:100%;min-height:44px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--text);
+  padding:10px 12px;outline:none;transition:border-color .15s,box-shadow .15s
+}
+input[type=number].unit-pad{padding-right:66px}
+input:focus,select:focus{border-color:#4394c8;box-shadow:0 0 0 3px rgba(67,148,200,.12)}
+.unit{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:var(--sub);pointer-events:none}
+.bmi-box{height:100%;min-height:68px;border:1px solid #b9d3e5;background:var(--primary-lt);border-radius:10px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bmi-val{font-size:25px;font-weight:800;color:var(--primary-dk);font-variant-numeric:tabular-nums}
+.bmi-cat{font-size:12px;color:var(--sub);text-align:right}
+.help{font-size:12px;color:var(--sub);margin-top:5px}
+.note{font-size:12px;color:var(--sub);background:#f8fafc;border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-top:10px}
+.info-note{font-size:12px;color:#184d77;background:#f0f7fc;border:1px solid #c9e1f1;border-radius:9px;padding:9px 11px;margin-top:10px}
+.warn-note{font-size:12px;color:#854d0e;background:var(--warn-bg);border:1px solid #f2d59c;border-radius:9px;padding:9px 11px;margin-top:10px}
+.hidden{display:none!important}
+.check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.check-item,.radio-item{display:flex;gap:9px;align-items:flex-start;background:#fafcfd;border:1px solid var(--border);border-radius:9px;padding:10px 11px;cursor:pointer;font-size:13px}
+.check-item input,.radio-item input{margin:3px 0 0;transform:scale(1.08);flex:0 0 auto}
+.check-item:hover,.radio-item:hover{border-color:#9cc3dc;background:#f5fafc}
+.auto-tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.tag{font-size:11px;border-radius:999px;padding:4px 9px;background:#eef2f6;color:#53677a;border:1px solid #dde5eb}
+.tag.on{background:#e7f6ef;color:#047857;border-color:#b9e5d2;font-weight:700}
+.count-box{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.count-num{font-size:22px;font-weight:800;color:var(--primary-dk)}
+.inline-check{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#4f6376;margin-top:8px}
+.inline-check input{margin-top:4px}
+details{border:1px solid var(--border);border-radius:10px;background:#fbfcfd;margin-top:10px;overflow:hidden}
+summary{cursor:pointer;padding:10px 12px;font-size:13px;font-weight:750;color:var(--primary-dk)}
+details .details-body{padding:0 12px 12px;font-size:12px;color:var(--sub)}
+.action-bar{position:sticky;bottom:8px;z-index:10;display:flex;gap:8px;background:rgba(238,243,247,.92);backdrop-filter:blur(7px);padding:8px;border-radius:13px;margin:4px 0 14px}
+.primary-btn{flex:1;border:0;border-radius:10px;background:var(--primary);color:#fff;padding:13px 14px;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(22,92,141,.18)}
+.primary-btn:hover{background:var(--primary-dk)}
+.secondary-btn{border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--sub);padding:12px 15px;font-weight:700;cursor:pointer}
+.results-card{border:2px solid #b8d5e8}
+.result-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}
+.metric{background:var(--primary-lt);border:1px solid #c6ddea;border-radius:10px;text-align:center;padding:9px}
+.metric-lbl{font-size:10px;font-weight:800;color:var(--primary);letter-spacing:.04em}
+.metric-val{font-size:21px;font-weight:850;color:var(--primary-dk);font-variant-numeric:tabular-nums}
+.result-list{display:grid;gap:10px}
+.result{border-radius:11px;padding:12px 13px;border-left:5px solid;background:#fafafa}
+.result.ok{background:var(--ok-bg);border-color:var(--ok)}
+.result.warn{background:var(--warn-bg);border-color:var(--warn)}
+.result.ng{background:var(--ng-bg);border-color:var(--ng)}
+.result.info{background:var(--info-bg);border-color:var(--info)}
+.result.pending{background:var(--pending-bg);border-color:var(--pending)}
+.result-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:3px}
+.result-name{font-size:15px;font-weight:850;color:#203040}
+.pill{font-size:10px;font-weight:850;white-space:nowrap;border-radius:999px;padding:3px 8px;background:rgba(255,255,255,.7);border:1px solid rgba(80,90,100,.15)}
+.result p{font-size:14px;line-height:1.7;margin:5px 0;color:#475b6d}
+.result ul{font-size:13.5px;line-height:1.7;margin:7px 0 0;padding-left:20px;color:#53677a}
+.evidence-btn{margin-top:9px;border:1px solid #8fb8d2;background:#fff;color:var(--primary);border-radius:8px;padding:7px 10px;font-size:12.5px;font-weight:800;cursor:pointer}
+.evidence-btn:hover{background:#f4f9fc}
+.evidence-box{margin-top:8px;background:rgba(255,255,255,.72);border:1px solid rgba(105,130,150,.25);border-radius:9px;padding:10px 11px;font-size:12.5px;line-height:1.75;color:#4b6072}
+.evidence-box strong{color:#24465f}
+.evidence-box a{color:var(--primary);word-break:break-all}
+.review-notice{background:#f0f7fc;border:1.5px solid #9fcbe6;border-radius:12px;padding:12px 14px;margin:0 0 14px;color:#24465f;font-size:13px;line-height:1.75}
+.review-notice strong{color:var(--primary-dk)}
+
+.facility-notice{background:#fff8e8;border:1.5px solid #e0b35a;border-radius:12px;padding:12px 14px;margin:0 0 14px;color:#614813;font-size:13px;line-height:1.75}
+.facility-notice strong{color:#8a5b00}
+.duration-output{margin-top:12px;border-radius:10px;padding:12px 13px;background:var(--primary-lt);border:1px solid #c6ddea;color:var(--primary-dk)}
+.duration-date{font-size:22px;font-weight:850;font-variant-numeric:tabular-nums}
+.sources{font-size:11.5px;color:var(--sub)}
+.sources a{color:var(--primary);word-break:break-all}
+.footer-note{font-size:12px;color:#66788a;background:#fff;border:1px solid var(--border);border-radius:12px;padding:13px 15px}
+.small{font-size:11px;color:var(--sub)}
+.copyright-banner{
+  margin:0 0 16px;background:#fff7ed;border:2px solid #c2410c;border-radius:13px;
+  padding:13px 15px;text-align:center;color:#7c2d12;box-shadow:0 2px 8px rgba(124,45,18,.08)
+}
+.copyright-banner .owner{font-size:14px;font-weight:850;line-height:1.55}
+.copyright-banner .restriction{font-size:12.5px;font-weight:750;margin-top:4px;line-height:1.55}
+.copyright-banner .no-break{white-space:nowrap}
+.copyright-footer{margin:14px 0 0;text-align:center;font-size:11.5px;color:#5b6570;line-height:1.7}
+.copyright-footer strong{color:#374151}
+
+hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
+@media(max-width:680px){
+  .wrap{padding:15px 10px 40px}
+  .card{padding:16px 13px;border-radius:13px}
+  .grid,.grid3,.check-grid{grid-template-columns:1fr}
+  .result-summary{grid-template-columns:1fr 1fr}
+  .action-bar{bottom:4px}
+  .secondary-btn{padding-left:12px;padding-right:12px}
+}
+@media(max-width:380px){
+  .result-summary{grid-template-columns:1fr}
+  .result-hd{display:block}
+  .pill{display:inline-block;margin-top:4px}
+}
+@media print{
+  body{background:#fff}.wrap{max-width:none}.action-bar{display:none}.card{box-shadow:none;break-inside:avoid}
+  details{display:block}details .details-body{display:block}
+}
+</style>
+
+<meta name="theme-color" content="#165c8d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="badge">医療者向け・判定補助</div>
+  <h1>肥満症治療選択サポート</h1>
+  <p class="subtitle">BMI・合併症・糖代謝・OSAS・MASHから、手術／注射製剤の基準上の候補を整理します。</p>
+  <span class="version">Obsupport.2　｜　最終更新日：2026年9月4日　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
+</header>
+
+<div class="copyright-banner" role="note" aria-label="著作権・Creative Commonsライセンス">
+  <div class="owner">
+    <span id="copyright-signature">© 2026 大平征宏</span><br>
+    <span id="copyright-affiliation">東邦大学医療センター大橋病院 糖尿病・代謝・内分泌内科</span><br>
+    <span id="copyright-license-line">Licensed under CC BY-NC-ND 4.0</span>
+  </div>
+  <div class="restriction" id="cc-license-notice">
+    本ツールは <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja" target="_blank" rel="noopener">Creative Commons 表示—非営利—改変禁止 4.0 国際（CC BY-NC-ND 4.0）</a> の下で提供します。<br>
+    適切なクレジット表示を条件に、<strong>非営利目的で、内容を改変せずに複製・再配布できます。</strong>営利利用および改変したものの共有・配布には、<span class="no-break">著作権者の許可が必要です。</span>
+  </div>
+</div>
+
+<div class="review-notice" role="note" aria-label="本ツールの目的と利用上の注意">
+  <strong>医療従事者向けの判定補助ツールです。</strong><br>
+  本ツールは、日本国内の承認された効能・効果、最適使用推進ガイドライン、診療報酬上の基準等を整理し、治療候補の確認を補助することを目的としています。
+  診断、処方、手術適応その他の医療判断を自動的に決定するものではなく、最終的な判断は医師が最新の添付文書・ガイドライン・保険通知、禁忌、併用薬、施設要件および個々の患者背景を確認した上で行ってください。
+</div>
+
+
+<div class="facility-notice" role="note" aria-label="ウゴービ・ゼップバウンドの施設・医師要件に関する注意">
+  <strong>施設・医師要件について</strong><br>
+  ウゴービ、ゼップバウンドを保険診療で実際に処方・投与する際には、適応ごとの最適使用推進ガイドライン等で定められた<strong>施設要件・医師要件などを満たす必要があり、すべての医療機関で投与できるわけではありません。</strong><br>
+  本ツールは患者側の適応条件を整理するためのもので、施設・医師要件そのものを判定する機能はありません。クリニックや投与要件を満たさない施設でも、治療候補の確認や適切な施設への紹介を検討する際の参考として利用できます。実際の処方・投与にあたっては、最新の添付文書・最適使用推進ガイドライン・保険通知等で施設・医師要件を必ず確認してください。
+</div>
+
+<div class="card">
+  <div class="card-hd">1　基本情報・BMI</div>
+  <div class="grid3">
+    <div class="field">
+      <label for="height">身長 <span class="req">*</span></label>
+      <div class="input-wrap"><input class="unit-pad" id="height" type="number" inputmode="decimal" min="80" max="230" step="0.1" placeholder="例：165"><span class="unit">cm</span></div>
+    </div>
+    <div class="field">
+      <label for="weight">体重 <span class="req">*</span></label>
+      <div class="input-wrap"><input class="unit-pad" id="weight" type="number" inputmode="decimal" min="20" max="400" step="0.1" placeholder="例：95"><span class="unit">kg</span></div>
+    </div>
+    <div class="field">
+      <span class="label">BMI（自動計算）</span>
+      <div class="bmi-box"><span class="bmi-val" id="bmiVal">—</span><span class="bmi-cat" id="bmiCat">身長・体重を入力</span></div>
+      <span class="help"><strong>BMI表示・判定：</strong>小数第2位以下を切り捨て、小数1位で扱います（四捨五入による基準値への繰り上げは行いません）。</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-hd">2　糖尿病・耐糖能・高血圧・脂質異常症</div>
+  <div class="grid">
+    <div class="field">
+      <label for="dm">2型糖尿病</label>
+      <select id="dm">
+        <option value="no">なし</option><option value="yes">あり</option>
+      </select>
+    </div>
+    <div class="field hidden" id="hba1cWrap">
+      <label for="hba1c">HbA1c</label>
+      <div class="input-wrap"><input class="unit-pad" id="hba1c" type="number" inputmode="decimal" min="3" max="20" step="0.1" placeholder="例：8.2"><span class="unit">%</span></div>
+      <span class="help">BMI 32～34.9の手術基準判定にも使用します。</span>
+    </div>
+    <div class="field hidden" id="dmDrugWrap">
+      <label for="dmDrug">2型糖尿病に対する薬物療法</label>
+      <select id="dmDrug"><option value="no">なし／未確認</option><option value="yes">あり</option></select>
+    </div>
+    <div class="field" id="igtWrap">
+      <label for="igt">耐糖能異常（IGT等）</label>
+      <select id="igt"><option value="no">なし</option><option value="unknown">未評価</option><option value="yes">あり</option></select>
+    </div>
+    <div class="field">
+      <label for="ht">高血圧</label>
+      <select id="ht">
+        <option value="no">なし</option>
+        <option value="yes_no_med">あり・薬物療法なし／未確認</option>
+        <option value="yes_med">あり・薬物療法あり</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="dl">脂質異常症</label>
+      <select id="dl">
+        <option value="no">なし</option>
+        <option value="yes_no_med">あり・薬物療法なし／未確認</option>
+        <option value="yes_med">あり・薬物療法あり</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="igtDetail" class="hidden">
+    <div class="section-title">ゼップバウンド：高血圧／脂質異常症を伴わない耐糖能異常の確認</div>
+    <div class="grid3">
+      <div class="field"><label for="fpg">空腹時血糖</label><div class="input-wrap"><input class="unit-pad" id="fpg" type="number" inputmode="decimal" step="1" placeholder="例：110"><span class="unit">mg/dL</span></div></div>
+      <div class="field"><label for="ogtt2h">75gOGTT 2時間値</label><div class="input-wrap"><input class="unit-pad" id="ogtt2h" type="number" inputmode="decimal" step="1" placeholder="例：155"><span class="unit">mg/dL</span></div></div>
+      <div class="field"><label for="igtA1c">HbA1c</label><div class="input-wrap"><input class="unit-pad" id="igtA1c" type="number" inputmode="decimal" step="0.1" placeholder="例：6.0"><span class="unit">%</span></div></div>
+    </div>
+    <label class="inline-check"><input id="diabeticRange" type="checkbox"> 上記とは別に「糖尿病型に該当する」ことを医師が確認済み</label>
+    <div class="info-note" id="igtCriteriaText">3項目のうち2項目以上、または糖尿病型への該当を確認します。</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-hd">3　肥満に関連する健康障害</div>
+  <div class="auto-tags" id="autoTags"></div>
+  <div class="check-grid">
+    <label class="check-item"><input type="checkbox" id="c_ua"> <span>高尿酸血症・痛風</span></label>
+    <label class="check-item"><input type="checkbox" id="c_cad"> <span>冠動脈疾患（心筋梗塞・狭心症）</span></label>
+    <label class="check-item"><input type="checkbox" id="c_stroke"> <span>脳梗塞／一過性脳虚血発作</span></label>
+    <label class="check-item"><input type="checkbox" id="c_nafld"> <span>脂肪性肝疾患（NAFLD/MASLD等）</span></label>
+    <label class="check-item"><input type="checkbox" id="c_menses"> <span>月経異常・女性不妊</span></label>
+    <div class="check-item"><span><strong>閉塞性睡眠時無呼吸症候群（OSAS）／肥満低換気症候群</strong><br><span class="small">下記「5 OSAS」で「なし／未評価／あり」を選択</span></span></div>
+    <label class="check-item"><input type="checkbox" id="c_ms"> <span>運動器疾患（変形性関節症・変形性脊椎症等）</span></label>
+    <label class="check-item"><input type="checkbox" id="c_kidney"> <span>肥満関連腎臓病</span></label>
+  </div>
+  <div class="count-box"><span><strong>健康障害の合計</strong><br><span class="small">糖代謝・高血圧・脂質異常症を含め自動集計</span></span><span><span class="count-num" id="healthCount">0</span> / 11</span></div>
+</div>
+
+<div class="card">
+  <div class="card-hd">4　事前治療の確認</div>
+  <div class="check-grid">
+    <label class="check-item"><input type="checkbox" id="dietFailure"> <span>食事療法・運動療法を行っても十分な効果が得られていない</span></label>
+    <label class="check-item"><input type="checkbox" id="drugProgram6m"> <span>肥満症薬物療法：投与施設で6か月以上の食事・運動療法を実施し、管理栄養士の栄養指導（2か月に1回以上）を受けている</span></label>
+    <label class="check-item"><input type="checkbox" id="surgery6m"> <span>手術：6か月以上の内科的治療を行っても十分な効果が得られていない</span></label>
+  </div>
+  <div class="warn-note">ゼップバウンド／ウゴービを<strong>肥満症として保険診療で使用する判定</strong>では、高血圧・脂質異常症・2型糖尿病のいずれかが診断され、さらに投与開始前からそのいずれか1つ以上に適切な薬物療法が行われていることも確認します。</div>
+</div>
+
+<div class="card" id="osasCard">
+  <div class="card-hd">5　OSAS（ゼップバウンドの独立適応）</div>
+  <p class="note">OSAS／肥満低換気症候群の評価状況を選択してください。<strong>OSASを「あり」とする場合は睡眠検査の種類とAHI／REIの入力を必須</strong>とします。<strong>AHI／REI 15以上では症状の有無にかかわらずOSASとしてカウントし、5以上15未満ではOSAS関連症状「あり」の確認を必須</strong>とします。AHI／REI 5未満、または5以上15未満で症状なしの場合は、本ツールではOSASを肥満関連健康障害・手術合併症としてカウントしません。実際の診断は最新の診療ガイドラインに基づき医師が確認してください。</p>
+  <p class="info-note"><strong>CPAP／PAP治療中でも、OSASの診断が継続している場合は「あり」として扱えます。</strong>通常の肥満症治療における肥満関連健康障害および減量・代謝改善手術の合併症としても同様です。ゼップバウンドのOSAS独立適応を判定する際は、処方検討時のPSG／OCSTによるAHI／REIを入力してください。CPAP機器に表示される治療中の残存AHIは、この欄の判定値として使用しません。</p>
+  <div class="grid">
+    <div class="field"><label for="osasStatus">OSAS／肥満低換気症候群</label><select id="osasStatus"><option value="no">なし</option><option value="unknown">未評価</option><option value="yes">あり</option></select></div>
+    <div class="field"><label for="sleepTest">睡眠検査 <span class="req">（OSASありの場合必須）</span></label><select id="sleepTest"><option value="none">未入力</option><option value="psg">PSG（ポリソムノグラフィー）</option><option value="ocst">簡易施設外睡眠検査（OCST）</option></select></div>
+    <div class="field hidden" id="sleepIndexWrap"><label id="sleepIndexLabel" for="sleepIndex">AHI <span class="req">*</span></label><div class="input-wrap"><input class="unit-pad" id="sleepIndex" type="number" inputmode="decimal" min="0" step="0.1"><span class="unit">/h</span></div></div>
+    <div class="field hidden" id="osasSymptomsWrap"><label for="osasSymptoms">OSAS関連症状 <span class="req">（AHI／REI 5以上15未満の場合必須）</span></label><select id="osasSymptoms"><option value="unknown">未確認</option><option value="yes">あり</option><option value="no">なし</option></select><div class="small">日中の眠気、疲労、非回復性睡眠、不眠、睡眠中の窒息感・喘ぎ、習慣性いびき、目撃される無呼吸などを確認します。</div></div>
+  </div>
+  <div id="osasDiagMessage" class="warn-note hidden" role="alert"></div>
+  <div class="check-grid" style="margin-top:10px">
+    <label class="check-item"><input type="checkbox" id="osas3m"> <span>投与施設で3か月以上の食事・運動療法を実施しても十分な体重減少がなく、期間中に管理栄養士の指導を1回以上受けた</span></label>
+    <label class="check-item"><input type="checkbox" id="osasException"> <span>3か月要件の例外を医師が確認（CPAPでも改善しない肥満低換気症候群、または心不全で早期開始が必要）</span></label>
+  </div>
+  <details><summary>略語：PSG / AHI / OCST / REI</summary><div class="details-body">
+    <strong>PSG</strong>＝polysomnography（ポリソムノグラフィー）。<br>
+    <strong>AHI</strong>＝apnea-hypopnea index（無呼吸低呼吸指数）。PSGで評価します。<br>
+    <strong>OCST</strong>＝out-of-center sleep testing（簡易施設外睡眠検査）。いわゆる簡易モニターによる検査です。<br>
+    <strong>REI</strong>＝respiratory event index（呼吸イベント指数）。OCSTではゼップバウンドの最適使用推進ガイドライン上、REI 30イベント/時間以上が患者選択基準です。
+  </div></details>
+</div>
+
+<div class="card" id="mashCard">
+  <div class="card-hd">6　MASH（ウゴービの独立適応）</div>
+  <div class="grid">
+    <div class="field"><label for="mash">MASH（代謝機能障害関連脂肪肝炎）</label><select id="mash"><option value="no">なし</option><option value="unknown">未評価</option><option value="yes">あり</option></select></div>
+    <div class="field hidden" id="cirrhosisWrap"><label for="cirrhosis">肝硬変</label><select id="cirrhosis"><option value="no">なし</option><option value="yes">あり</option><option value="unknown">不明</option></select></div>
+    <div class="field hidden" id="fibrosisWrap"><label for="fibrosis">肝線維化ステージ</label><select id="fibrosis"><option value="unknown">不明</option><option value="F0">F0</option><option value="F1">F1</option><option value="F2">F2</option><option value="F3">F3</option><option value="F4">F4</option></select></div>
+    <div class="field hidden" id="fibrosisMethodWrap"><label for="fibrosisMethod">判定方法</label><select id="fibrosisMethod"><option value="unknown">未入力</option><option value="biopsy">肝生検</option><option value="nit">NIT（非侵襲的検査）</option></select></div>
+  </div>
+  <div id="nitConfirmWrap" class="hidden">
+    <label class="inline-check"><input id="nitSpecialist" type="checkbox"> VCTE、2D-SWE、MRE、血液学的バイオマーカー等のうち2つ以上の検査法等を参考に、肝臓専門医／消化器病専門医がF2またはF3と総合判断している</label>
+  </div>
+  <details><summary>略語：MASH / NIT / VCTE / 2D-SWE / MRE / FIB-4</summary><div class="details-body">
+    <strong>MASH</strong>＝metabolic dysfunction-associated steatohepatitis（代謝機能障害関連脂肪肝炎）。<br>
+    <strong>NIT</strong>＝non-invasive test（非侵襲的検査）。肝生検を行わずに線維化等を評価する検査の総称です。<br>
+    <strong>VCTE</strong>＝vibration-controlled transient elastography（振動制御トランジェントエラストグラフィ）。FibroScan等で肝硬度を測定します。<br>
+    <strong>2D-SWE</strong>＝two-dimensional shear wave elastography（2Dせん断波エラストグラフィ）。<br>
+    <strong>MRE</strong>＝magnetic resonance elastography（MRエラストグラフィ）。<br>
+    <strong>FIB-4</strong>＝Fibrosis-4 index。年齢、AST、ALT、血小板数から算出する肝線維化の血液学的指標です。<br><br>
+    NITだけでF2/F3を決める場合は単一数値だけで自動判定せず、複数の検査結果と臨床所見を踏まえた専門医の総合判断を前提としています。
+  </div></details>
+</div>
+
+<div class="action-bar">
+  <button class="primary-btn" id="judgeBtn" type="button">治療選択肢を判定</button>
+  <button class="secondary-btn" id="resetBtn" type="button">リセット</button>
+</div>
+
+<div class="card results-card hidden" id="resultsCard">
+  <div class="card-hd">判定結果</div>
+  <div class="result-summary">
+    <div class="metric"><div class="metric-lbl">BMI</div><div class="metric-val" id="rBmi">—</div></div>
+    <div class="metric"><div class="metric-lbl">健康障害数</div><div class="metric-val" id="rCount">—</div></div>
+    <div class="metric"><div class="metric-lbl">肥満症薬のBMI/健康障害条件</div><div class="metric-val" id="rBase">—</div></div>
+  </div>
+  <div id="resultList" class="result-list"></div>
+</div>
+
+<div class="card">
+  <div class="card-hd">7　注射製剤の投与期間計算</div>
+  <div class="grid">
+    <div class="field">
+      <label for="durationDrug">製剤・適応</label>
+      <select id="durationDrug">
+        <option value="wegovy_obesity">ウゴービ（肥満症）</option>
+        <option value="zep_obesity">ゼップバウンド（肥満症）</option>
+        <option value="zep_osas">ゼップバウンド（OSAS）</option>
+        <option value="wegovy_mash">ウゴービ（MASH）</option>
+        <option value="mounjaro">マンジャロ（2型糖尿病）</option>
+        <option value="ozempic">オゼンピック（2型糖尿病）</option>
+      </select>
+    </div>
+    <div class="field"><label for="startDate">使用開始日</label><input type="date" id="startDate"></div>
+  </div>
+  <div class="duration-output" id="durationOutput">製剤・適応と使用開始日を入力すると、投与上限到達日または再評価日を表示します。</div>
+  <p class="small">「最大○週間」は開始日からの<strong>上限到達日</strong>を表示しています。週1回製剤の実際の最終投与日は、投与曜日・中止計画・休薬等により調整してください。</p>
+</div>
+
+<div class="card">
+  <div class="card-hd">プライバシー・オフライン動作</div>
+  <p class="note"><strong>患者データは保存・送信しません。</strong>入力された身長・体重・検査値・合併症等の情報は、判定のために端末内のメモリ上で一時的に処理されるだけで、端末・ブラウザの保存領域やファイルへの保存、外部サーバーへの送信、解析・広告目的の収集、第三者への共有は行いません。ページを閉じる、または入力をリセットすると、入力内容を再利用する機能はありません。</p>
+  <p class="note">判定機能はインターネット接続なしで使用できます。基準・参考資料の外部リンクを開く場合のみ通信が必要です。</p>
+</div>
+
+<div class="card sources">
+  <div class="card-hd">基準・参考資料</div>
+  <p>本ツールは、PMDAの最適使用推進ガイドライン・添付文書、厚生労働省の診療報酬関連資料等に基づき、治療選択に必要な条件を整理する判定補助ツールです。各判定結果の「根拠を見る」から、その判定で参照している基準の要点を画面内で確認できます。外部リンクは原資料の確認用です。</p>
+  <ul>
+    <li><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05" target="_blank" rel="noopener">PMDA：ゼップバウンド添付文書</a></li>
+    <li><a href="https://www.pmda.go.jp/files/000280607.pdf" target="_blank" rel="noopener">PMDA：ゼップバウンド 最適使用推進ガイドライン（肥満症）</a></li>
+    <li><a href="https://www.pmda.go.jp/files/000280608.pdf" target="_blank" rel="noopener">PMDA：ゼップバウンド 最適使用推進ガイドライン（OSAS）</a></li>
+    <li><a href="https://www.pmda.go.jp/PmdaSearch/iyakuDetail/620023_2499418G5023_1_07" target="_blank" rel="noopener">PMDA：ウゴービ添付文書</a></li>
+    <li><a href="https://www.pmda.go.jp/files/000281140.pdf" target="_blank" rel="noopener">PMDA：ウゴービ 最適使用推進ガイドライン（肥満症）</a></li>
+    <li><a href="https://www.pmda.go.jp/files/000281141.pdf" target="_blank" rel="noopener">PMDA：ウゴービ 最適使用推進ガイドライン（MASH）</a></li>
+    <li><a href="https://www.mhlw.go.jp/content/12400000/001732089.pdf" target="_blank" rel="noopener">厚生労働省：令和8年度 医科診療報酬点数表に関する事項（K656-2 腹腔鏡下胃縮小術）</a></li>
+  </ul>
+</div>
+
+<div class="footer-note">
+  <strong>重要：</strong>本ツールは医療者が適応条件を整理するための補助ツールであり、診断・処方・手術適応を自動決定するものではありません。禁忌、併用薬、施設・医師要件、最新の保険通知、個々の患者背景は別途確認してください。特にゼップバウンドの「耐糖能異常のみ」の肥満症適応は、承認上の効能・効果と保険給付範囲が一致しないため、本ツールでは別表示します。
+</div>
+</div>
+
+<div class="copyright-footer">
+  <strong>© 2026 大平征宏</strong><br>
+  東邦大学医療センター大橋病院 糖尿病・代謝・内分泌内科<br>
+  <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja" target="_blank" rel="noopener">Licensed under CC BY-NC-ND 4.0</a><br>
+  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　最終更新日：2026年9月4日
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const qsa = s => Array.from(document.querySelectorAll(s));
+
+function num(id){ const v=parseFloat($(id).value); return Number.isFinite(v)?v:null; }
+function yes(id){ return $(id).checked; }
+function bmiRawValue(){ const h=num('height'), w=num('weight'); if(!h||!w) return null; return w/Math.pow(h/100,2); }
+function bmiValue(){ const b=bmiRawValue(); if(b==null)return null; return Math.floor((b+1e-12)*10)/10; }
+function bmiCategory(b){
+  if(b==null) return '身長・体重を入力';
+  if(b<18.5) return '低体重'; if(b<25) return '普通体重'; if(b<30) return '肥満1度';
+  if(b<35) return '肥満2度'; if(b<40) return '肥満3度'; return '肥満4度';
+}
+function updateBmi(){ const b=bmiValue(); $('bmiVal').textContent=b==null?'—':b.toFixed(1); $('bmiCat').textContent=bmiCategory(b); }
+
+function setHidden(id, hidden){ $(id).classList.toggle('hidden', hidden); }
+
+function osasDiagnosticState(){
+  const status=$('osasStatus').value;
+  const method=$('sleepTest').value;
+  const idx=num('sleepIndex');
+  const symptoms=$('osasSymptoms').value;
+  const requiredComplete=status==='yes' && method!=='none' && idx!=null;
+  const symptomRequired=requiredComplete && idx>=5 && idx<15;
+  const diagnosisOk=requiredComplete && (idx>=15 || (idx>=5 && idx<15 && symptoms==='yes'));
+  const zepboundIndexOk=diagnosisOk && ((method==='psg' && idx>=15) || (method==='ocst' && idx>=30));
+  return {status,method,idx,symptoms,requiredComplete,symptomRequired,diagnosisOk,zepboundIndexOk};
+}
+
+function updateOsasDiagnosticMessage(){
+  const o=osasDiagnosticState();
+  const box=$('osasDiagMessage');
+  if(o.status!=='yes'){
+    box.classList.add('hidden'); box.textContent=''; return;
+  }
+  box.className='warn-note';
+  if(o.method==='none'){
+    box.innerHTML='<strong>睡眠検査の入力が必要です。</strong> OSAS「あり」の場合は、PSGまたは簡易施設外睡眠検査（OCST）を選択してください。';
+    return;
+  }
+  if(o.idx==null){
+    box.innerHTML=`<strong>${o.method==='ocst'?'REI':'AHI'}の入力が必要です。</strong> OSAS「あり」の場合は検査結果を入力してください。`;
+    return;
+  }
+  if(o.idx<5){
+    box.innerHTML=`<strong>OSASの診断内容を確認してください。</strong> 入力された${o.method==='ocst'?'REI':'AHI'} ${o.idx}/h は5未満です。本ツールではOSASを肥満関連健康障害・手術合併症としてカウントしません。`;
+    return;
+  }
+  if(o.symptomRequired && o.symptoms==='unknown'){
+    box.innerHTML='<strong>OSAS関連症状の確認が必要です。</strong> AHI／REI 5以上15未満では、OSAS関連症状「あり」の確認が必要です。';
+    return;
+  }
+  if(o.symptomRequired && o.symptoms==='no'){
+    box.innerHTML=`<strong>OSASの診断基準を満たしていないので確認してください。</strong> ${o.method==='ocst'?'REI':'AHI'} ${o.idx}/h は5以上15未満ですが、OSAS関連症状「なし」のため、本ツールではOSASを肥満関連健康障害・手術合併症としてカウントしません。`;
+    return;
+  }
+  if(!o.zepboundIndexOk){
+    box.className='info-note';
+    box.innerHTML=`OSASとしてカウントします。なお、ゼップバウンド（OSAS）の独立適応に必要な${o.method==='ocst'?'REI 30以上':'PSG AHI 15以上'}の条件は満たしていません。`;
+    return;
+  }
+  box.className='info-note';
+  box.innerHTML='OSASとしてカウントします。ゼップバウンド（OSAS）のAHI／REI条件も満たしています。';
+}
+function updateConditional(){
+  const dm=$('dm').value==='yes';
+  setHidden('hba1cWrap',!dm); setHidden('dmDrugWrap',!dm); setHidden('igtWrap',dm);
+  if(dm){ $('igt').value='no'; setHidden('igtDetail',true); }
+  else setHidden('igtDetail',$('igt').value!=='yes');
+
+  const osasStatus=$('osasStatus').value;
+  const st=$('sleepTest').value;
+  setHidden('sleepIndexWrap',osasStatus!=='yes' || st==='none');
+  $('sleepIndexLabel').innerHTML=(st==='ocst'?'REI':'AHI')+' <span class="req">*</span>';
+  const idx=num('sleepIndex');
+  const symptomRequired=osasStatus==='yes' && st!=='none' && idx!=null && idx>=5 && idx<15;
+  setHidden('osasSymptomsWrap',!symptomRequired);
+  if(!symptomRequired) $('osasSymptoms').value='unknown';
+
+  const mash=$('mash').value==='yes';
+  setHidden('cirrhosisWrap',!mash); setHidden('fibrosisWrap',!mash); setHidden('fibrosisMethodWrap',!mash);
+  setHidden('nitConfirmWrap',!(mash && $('fibrosisMethod').value==='nit'));
+  updateOsasDiagnosticMessage(); updateHealthCount(); updateIgtCriteria();
+}
+
+function healthState(){
+  const dm=$('dm').value==='yes';
+  const igt=!dm && $('igt').value==='yes';
+  const ht=$('ht').value!=='no';
+  const dl=$('dl').value!=='no';
+  const extraIds=['c_ua','c_cad','c_stroke','c_nafld','c_menses','c_ms','c_kidney'];
+  const extra=extraIds.filter(id=>yes(id)).length;
+  const osas=osasDiagnosticState().diagnosisOk;
+  return {dm,igt,ht,dl,osas,count:(dm||igt?1:0)+(ht?1:0)+(dl?1:0)+(osas?1:0)+extra};
+}
+function updateHealthCount(){
+  const s=healthState(); $('healthCount').textContent=s.count;
+  const tags=[];
+  tags.push(`<span class="tag ${s.dm||s.igt?'on':''}">耐糖能障害：${s.dm?'2型糖尿病':s.igt?'耐糖能異常':'なし'}</span>`);
+  tags.push(`<span class="tag ${s.ht?'on':''}">高血圧：${s.ht?'あり':'なし'}</span>`);
+  tags.push(`<span class="tag ${s.dl?'on':''}">脂質異常症：${s.dl?'あり':'なし'}</span>`);
+  $('autoTags').innerHTML=tags.join('');
+}
+
+function igtConfirmation(){
+  if($('dm').value==='yes' || $('igt').value!=='yes') return {count:0,confirmed:false,details:[]};
+  const f=num('fpg'), o=num('ogtt2h'), a=num('igtA1c');
+  const details=[]; let count=0;
+  if(f!=null){ const hit=f>=100 && f<=125; if(hit)count++; details.push(`FPG ${f} mg/dL：${hit?'該当':'非該当'}`); }
+  if(o!=null){ const hit=o>=140 && o<=199; if(hit)count++; details.push(`OGTT 2h ${o} mg/dL：${hit?'該当':'非該当'}`); }
+  if(a!=null){ const hit=a>=5.7 && a<=6.4; if(hit)count++; details.push(`HbA1c ${a}%：${hit?'該当':'非該当'}`); }
+  const diabetic=yes('diabeticRange');
+  return {count,confirmed:count>=2||diabetic,diabetic,details};
+}
+function updateIgtCriteria(){
+  if($('igt').value!=='yes') return;
+  const r=igtConfirmation();
+  $('igtCriteriaText').innerHTML=`判定項目：<strong>${r.count}/3項目</strong>該当${r.diabetic?' ＋ 糖尿病型確認済み':''}。` + (r.confirmed?' <strong>承認上の追加条件を満たす入力です。</strong>':' 2項目以上、または糖尿病型の確認が必要です。');
+}
+
+const EVIDENCE = {
+  lifestyle:{title:'基本治療の位置づけ',text:'肥満症の治療では、食事療法・運動療法・行動療法を基本とし、薬物療法や手術療法を行う場合も継続して実施します。',links:[]},
+  diabetes:{title:'2型糖尿病治療薬としての位置づけ',text:'マンジャロ／オゼンピックは、本ツールでは2型糖尿病がある場合に糖尿病治療薬として候補表示します。肥満症治療薬としての適応を判定する表示ではありません。実際の処方では各製剤の最新添付文書を確認してください。',links:[]},
+  obesityDrug:{title:'肥満症：ウゴービ／ゼップバウンド',text:'BMI 35 kg/m²以上、またはBMI 27 kg/m²以上で肥満関連健康障害を2つ以上有することに加え、最適使用推進ガイドライン上の患者選択条件（食事・運動療法、栄養指導、対象疾患への薬物療法等）を確認して判定しています。投与期間はウゴービ最大68週間、ゼップバウンド最大72週間です。',links:[['PMDA：ゼップバウンド添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05'],['PMDA：ゼップバウンド 最適使用推進ガイドライン（肥満症）','https://www.pmda.go.jp/files/000280607.pdf'],['PMDA：ウゴービ添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/620023_2499418G5023_1_07'],['PMDA：ウゴービ 最適使用推進ガイドライン（肥満症）','https://www.pmda.go.jp/files/000281140.pdf']]},
+  igt:{title:'ゼップバウンド：耐糖能異常を含む耐糖能障害',text:'ゼップバウンドの肥満症では、承認上の条件として耐糖能障害（2型糖尿病、耐糖能異常等）が含まれます。高血圧・脂質異常症を伴わない耐糖能異常では、入力されたFPG・75gOGTT 2時間値・HbA1c等から追加条件を確認します。本ツールでは承認上の条件と保険給付上の取扱いを分けて表示します。',links:[['PMDA：ゼップバウンド添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05'],['PMDA：ゼップバウンド 最適使用推進ガイドライン（肥満症）','https://www.pmda.go.jp/files/000280607.pdf']]},
+  surgery:{title:'腹腔鏡下胃縮小術の保険算定基準',text:'腹腔鏡下スリーブ状胃切除術および腹腔鏡下スリーブ・バイパス術について、BMI、対象合併症、HbA1c、6か月以上の内科的治療等の入力から、令和8年度診療報酬の主要な算定条件を整理して表示します。実施施設・術前評価等の要件は別途確認が必要です。',links:[['厚生労働省：令和8年度 医科診療報酬点数表に関する事項（K656-2）','https://www.mhlw.go.jp/content/12400000/001732089.pdf']]},
+  osas:{title:'ゼップバウンド：OSAS',text:'OSAS「あり」の場合はPSG／OCSTの結果入力を必須とします。本ツールではAHI／REI 15以上、または5以上15未満でOSAS関連症状「あり」の場合にOSASを肥満関連健康障害・手術合併症としてカウントします。AHI／REI 5未満、または5以上15未満で症状なしの場合はカウントしません。ゼップバウンドのOSAS独立適応ではBMI 27 kg/m²以上を前提とし、PSG AHI 15以上またはOCST REI 30以上、さらに事前の減量療法・栄養指導または規定された例外条件を確認します。CPAP／PAP治療中でも対象となり得ます。最大投与期間は52週間です。',links:[['PMDA：ゼップバウンド 最適使用推進ガイドライン（OSAS）','https://www.pmda.go.jp/files/000280608.pdf'],['PMDA：ゼップバウンド添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05']]},
+  mash:{title:'ウゴービ：MASH',text:'MASHの独立適応では、肝硬変を伴わないこと、中等度または高度の肝線維化（F2またはF3）、肝生検または規定されたNITと専門医の総合判断、BMI条件等を確認して判定します。固定された投与期間上限はなく、12か月ごとの再評価を前提とします。',links:[['PMDA：ウゴービ 最適使用推進ガイドライン（MASH）','https://www.pmda.go.jp/files/000281141.pdf'],['PMDA：ウゴービ添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/620023_2499418G5023_1_07']]}
+};
+function evidenceKeyFor(name){
+  if(name.includes('食事・運動・行動')) return 'lifestyle';
+  if(name.includes('マンジャロ')||name.includes('オゼンピック')) return 'diabetes';
+  if(name.includes('耐糖能異常')) return 'igt';
+  if(name.includes('スリーブ')) return 'surgery';
+  if(name.includes('OSAS')) return 'osas';
+  if(name.includes('MASH')) return 'mash';
+  if(name.includes('ウゴービ（肥満症）')||name.includes('ゼップバウンド（肥満症')) return 'obesityDrug';
+  return null;
+}
+function addResult(list,name,status,label,body,bullets=[]){ list.push({name,status,label,body,bullets,evidenceKey:evidenceKeyFor(name)}); }
+function missingText(items){ return items.length?`未充足／未確認：${items.join('、')}`:''; }
+
+function judge(){
+  const b=bmiValue();
+  if(b==null){ alert('身長と体重を入力してください。'); $('height').focus(); return; }
+  const osasCheck=osasDiagnosticState();
+  if(osasCheck.status==='yes' && osasCheck.method==='none'){
+    updateOsasDiagnosticMessage();
+    alert('OSAS「あり」の場合は、PSGまたは簡易施設外睡眠検査（OCST）を選択してください。');
+    $('sleepTest').focus(); return;
+  }
+  if(osasCheck.status==='yes' && osasCheck.idx==null){
+    updateOsasDiagnosticMessage();
+    alert(`OSAS「あり」の場合は、${osasCheck.method==='ocst'?'REI':'AHI'}を入力してください。`);
+    $('sleepIndex').focus(); return;
+  }
+  if(osasCheck.status==='yes' && osasCheck.symptomRequired && osasCheck.symptoms==='unknown'){
+    updateOsasDiagnosticMessage();
+    alert('AHI／REI 5以上15未満の場合は、OSAS関連症状の有無を入力してください。');
+    $('osasSymptoms').focus(); return;
+  }
+  const s=healthState();
+  const dm=s.dm, ht=s.ht, dl=s.dl, igt=s.igt;
+  const hba1c=num('hba1c');
+  const anyInsDx=dm||ht||dl;
+  const anyInsMed=(dm && $('dmDrug').value==='yes') || $('ht').value==='yes_med' || $('dl').value==='yes_med';
+  const obesityBase=(b>=35) || (b>=27 && s.count>=2);
+  const dietFailure=yes('dietFailure');
+  const drugProgram=yes('drugProgram6m');
+  const surgery6m=yes('surgery6m');
+  const osasStatus=$('osasStatus').value;
+  const osas=s.osas; const nafld=yes('c_nafld');
+  // BMI 32–34.9 のスリーブ手術判定用：
+  // HbA1c 8.0%以上の2型糖尿病を1項目として数え、HT/DL/OSAS/NAFLDと合わせて2項目以上。
+  // 高尿酸血症など、薬物療法では肥満関連健康障害に含まれる項目でも、ここでは手術基準の項目数に含めない。
+  const severeDmForSurgery=(dm && hba1c!=null && hba1c>=8.0);
+  const surgeryRelatedCount=(severeDmForSurgery?1:0)+(ht?1:0)+(dl?1:0)+(osas?1:0)+(nafld?1:0);
+
+  $('rBmi').textContent=b.toFixed(1); $('rCount').textContent=s.count; $('rBase').textContent=obesityBase?'○':'×';
+  const results=[];
+
+  addResult(results,'食事・運動・行動療法','info','基本治療','すべての肥満症治療の基盤です。薬物療法や手術を行う場合も継続が前提となります。');
+
+  if(dm){
+    addResult(results,'マンジャロ／オゼンピック','ok','2型糖尿病治療として候補','2型糖尿病があるため、糖尿病治療薬として検討候補になります。肥満症治療薬としての適応判定ではありません。');
+  } else {
+    addResult(results,'マンジャロ／オゼンピック','ng','2型糖尿病適応なし','入力上、2型糖尿病がないため、これらを「肥満症治療薬」として選択する判定にはしません。');
+  }
+
+  // Obesity drugs: insured optimal-use path
+  const obesityDrugMissing=[];
+  if(!obesityBase) obesityDrugMissing.push('BMI/健康障害数');
+  if(!anyInsDx) obesityDrugMissing.push('高血圧・脂質異常症・2型糖尿病のいずれかの診断');
+  if(!dietFailure) obesityDrugMissing.push('食事・運動療法で効果不十分');
+  if(!drugProgram) obesityDrugMissing.push('投与施設で6か月以上の食事・運動療法＋栄養指導');
+  if(!anyInsMed) obesityDrugMissing.push('高血圧・脂質異常・2型糖尿病のいずれかへの薬物療法');
+  const insuredObesityDrug=obesityDrugMissing.length===0;
+
+  if(insuredObesityDrug){
+    addResult(results,'ウゴービ（肥満症）','ok','保険・最適使用GL上の候補','入力された主要な患者選択条件を満たしています。最大投与期間は68週間です。', ['施設・医師要件、禁忌・併用薬等は別途確認してください。']);
+    addResult(results,'ゼップバウンド（肥満症）','ok','保険・最適使用GL上の候補','入力された主要な患者選択条件を満たしています。最大投与期間は72週間です。', ['施設・医師要件、禁忌・併用薬等は別途確認してください。']);
+  } else {
+    addResult(results,'ウゴービ（肥満症）','ng','現時点で主要要件未充足',missingText(obesityDrugMissing));
+    addResult(results,'ゼップバウンド（肥満症：保険診療）','ng','現時点で主要要件未充足',missingText(obesityDrugMissing));
+  }
+
+  // Zepbound approval-only IGT path, when insurance diseases absent
+  if(!anyInsDx && igt){
+    const ig=igtConfirmation();
+    const miss=[];
+    if(!obesityBase) miss.push('BMI/健康障害数');
+    if(!dietFailure) miss.push('食事・運動療法で効果不十分');
+    if(!ig.confirmed) miss.push('IGT追加条件（3項目中2項目以上又は糖尿病型）');
+    if(miss.length===0){
+      addResult(results,'ゼップバウンド（肥満症：耐糖能異常単独）','warn','承認上は候補／保険給付対象外','高血圧・脂質異常症・2型糖尿病がなく、耐糖能異常のみで入力されています。添付文書の承認条件には合致する入力ですが、現行の保険給付上の注意では肥満症の給付対象は高血圧・脂質異常症・2型糖尿病の場合に限られます。');
+    } else {
+      addResult(results,'ゼップバウンド（耐糖能異常単独）','warn','追加確認が必要',missingText(miss) + '。さらに、条件を満たしても耐糖能異常単独は現行の保険給付対象外です。');
+    }
+  }
+
+  // Surgery
+  const sleeveAnatomic=(b>=35 && (dm||ht||dl||osas||nafld)) || (b>=32 && b<35 && surgeryRelatedCount>=2);
+  const sleeve=sleeveAnatomic && surgery6m;
+  if(sleeve){
+    let why;
+    if(b>=35){
+      why='BMI 35以上＋対象合併症1つ以上';
+    } else {
+      const qualifying=[];
+      if(severeDmForSurgery) qualifying.push('2型糖尿病（HbA1c 8.0%以上）');
+      if(ht) qualifying.push('高血圧');
+      if(dl) qualifying.push('脂質異常');
+      if(osas) qualifying.push('OSAS');
+      if(nafld) qualifying.push('NAFLD/MASLD等');
+      why=`BMI 32～34.9＋手術基準上の対象項目2つ以上（${qualifying.join('、')}）`;
+    }
+    addResult(results,'腹腔鏡下スリーブ状胃切除術','ok','保険算定基準上の候補',`入力された主要な保険算定基準を満たしています。${why}。6か月以上の内科的治療を継続しても十分な効果が得られないことも確認されています。`,['実施施設・術前評価などの要件を別途確認してください。']);
+  } else {
+    const miss=[];
+    if(!sleeveAnatomic){
+      if(b>=32 && b<35){
+        miss.push(`手術基準上の対象項目2つ以上（現在 ${surgeryRelatedCount} 項目）`);
+      } else {
+        miss.push('BMI・対象合併症の組合せ');
+      }
+    }
+    if(!surgery6m) miss.push('6か月以上の内科的治療');
+    addResult(results,'腹腔鏡下スリーブ状胃切除術','ng','現時点で主要要件未充足',missingText(miss));
+  }
+  const bypassAnatomic=b>=35 && dm;
+  if(bypassAnatomic && surgery6m){
+    addResult(results,'腹腔鏡下スリーブ・バイパス術','ok','保険算定基準上の候補','BMI 35以上、2型糖尿病合併、6か月以上の内科的治療に抵抗性という主要条件を満たしています。',['施設・術式選択の詳細要件を別途確認してください。']);
+  } else {
+    const miss=[]; if(b<35)miss.push('BMI 35以上'); if(!dm)miss.push('2型糖尿病'); if(!surgery6m)miss.push('6か月以上の内科的治療');
+    addResult(results,'腹腔鏡下スリーブ・バイパス術','ng','現時点で主要要件未充足',missingText(miss));
+  }
+
+  // OSAS independent indication
+  if(osasStatus==='yes' && !osas){
+    const o=osasDiagnosticState();
+    const reason=o.idx<5
+      ? `入力された${o.method==='ocst'?'REI':'AHI'} ${o.idx}/h は5未満です。`
+      : `${o.method==='ocst'?'REI':'AHI'} ${o.idx}/h は5以上15未満ですが、OSAS関連症状「なし」の入力です。`;
+    addResult(results,'ゼップバウンド（OSAS）','ng','OSAS診断内容の確認が必要',`${reason} OSASの診断基準を確認してください。本ツールではOSASを肥満関連健康障害・手術合併症としてカウントしていません。`);
+  } else if(osas){
+    const o=osasDiagnosticState();
+    const preOk=yes('osas3m')||yes('osasException');
+    const miss=[]; if(b<27)miss.push('BMI 27以上'); if(!o.zepboundIndexOk)miss.push(o.method==='ocst'?'REI 30以上':'PSG AHI 15以上'); if(!preOk)miss.push('3か月の減量療法＋栄養指導、または例外条件');
+    if(miss.length===0){
+      addResult(results,'ゼップバウンド（OSAS）',b<30?'warn':'ok',b<30?'適応候補・慎重判断':'最適使用GL上の候補',`OSASの主要患者選択条件を満たしています。最大投与期間は52週間です。CPAP／PAP治療中でも対象となり得ます。${b<30?' BMI 27以上30未満は原則基準より低く、適用の必要性を慎重に判断します。':''}`);
+    } else addResult(results,'ゼップバウンド（OSAS）','ng','現時点で主要要件未充足',missingText(miss));
+  } else if(osasStatus==='unknown') {
+    addResult(results,'ゼップバウンド（OSAS）','pending','未判定（未評価）','OSAS／肥満低換気症候群が未評価です。評価後に「あり」を選択し、PSG／OCSTのAHI／REIを入力してください。AHI／REI 5以上15未満ではOSAS関連症状の確認も必要です。');
+  } else {
+    addResult(results,'ゼップバウンド（OSAS）','pending','OSAS適応なし','OSAS／肥満低換気症候群「なし」の入力です。OSASを根拠とする独立適応には該当しません。');
+  }
+
+  // MASH independent indication
+  if($('mash').value==='yes'){
+    const cir=$('cirrhosis').value, fib=$('fibrosis').value, method=$('fibrosisMethod').value;
+    const stageOk=fib==='F2'||fib==='F3';
+    const methodOk=method==='biopsy' || (method==='nit' && yes('nitSpecialist'));
+    const miss=[]; if(cir!=='no')miss.push('肝硬変なしの確認'); if(!stageOk)miss.push('F2またはF3'); if(!methodOk)miss.push('肝生検またはNIT＋専門医総合判断'); if(b<19)miss.push('BMI 19以上');
+    if(miss.length===0){
+      addResult(results,'ウゴービ（MASH）',b<23?'warn':'ok',b<23?'適応候補・慎重判断':'最適使用GL上の候補',`非肝硬変MASH、F2/F3の入力です。投与期間の固定上限は設けられておらず、開始約12か月後、その後も12か月ごとを目安に生検またはNITで再評価します。${b<23?' BMI 19以上23未満では慎重に適用を判断します。':''}`);
+    } else addResult(results,'ウゴービ（MASH）','ng','現時点で主要要件未充足',missingText(miss));
+  } else addResult(results,'ウゴービ（MASH）','pending','未判定（なし／未評価）','MASH「あり」を選択すると、非肝硬変・F2/F3・判定法・BMIを確認します。');
+
+  renderResults(results);
+  // 再判定時に投与期間欄も現在の適応条件で必ず再評価する。
+  // 以前に算出した投与期間が、適応消失後も残ることを防ぐ。
+  updateDuration();
+}
+
+function renderResults(results){
+  const icons={ok:'✓',warn:'!',ng:'×',info:'i',pending:'?'};
+  $('resultList').innerHTML=results.map((r,i)=>{
+    const ev=r.evidenceKey?EVIDENCE[r.evidenceKey]:null;
+    const evHtml=ev?`<button class="evidence-btn" type="button" aria-expanded="false" aria-controls="evidence-${i}" onclick="toggleEvidence(${i},this)">根拠を見る</button><div class="evidence-box hidden" id="evidence-${i}"><strong>${ev.title}</strong><br>${ev.text}${ev.links.length?`<br><br><strong>原資料：</strong><ul>${ev.links.map(x=>`<li><a href="${x[1]}" target="_blank" rel="noopener">${x[0]}</a></li>`).join('')}</ul>`:''}</div>`:'';
+    return `<div class="result ${r.status}"><div class="result-hd"><div class="result-name">${icons[r.status]} ${r.name}</div><span class="pill">${r.label}</span></div><p>${r.body}</p>${r.bullets&&r.bullets.length?`<ul>${r.bullets.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}${evHtml}</div>`;
+  }).join('');
+  $('resultsCard').classList.remove('hidden');
+  $('resultsCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function toggleEvidence(i,btn){
+  const box=$(`evidence-${i}`); if(!box)return;
+  const opening=box.classList.contains('hidden');
+  box.classList.toggle('hidden');
+  btn.textContent=opening?'根拠を閉じる':'根拠を見る';
+  btn.setAttribute('aria-expanded',opening?'true':'false');
+}
+
+function parseDateLocal(s){ if(!s)return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,12,0,0); }
+function formatDate(d){ return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function addMonths(d,n){ const x=new Date(d); const day=x.getDate(); x.setDate(1); x.setMonth(x.getMonth()+n); const last=new Date(x.getFullYear(),x.getMonth()+1,0).getDate(); x.setDate(Math.min(day,last)); return x; }
+function durationEligibility(type){
+  const b=bmiValue();
+  if(b==null) return {ok:false, message:'身長・体重を入力してBMIを算出してください。'};
+  const s=healthState();
+  const dm=s.dm, ht=s.ht, dl=s.dl;
+  const anyInsDx=dm||ht||dl;
+  const anyInsMed=(dm && $('dmDrug').value==='yes') || $('ht').value==='yes_med' || $('dl').value==='yes_med';
+  const obesityBase=(b>=35) || (b>=27 && s.count>=2);
+  const dietFailure=yes('dietFailure');
+  const drugProgram=yes('drugProgram6m');
+
+  if(type==='wegovy_obesity' || type==='zep_obesity'){
+    const miss=[];
+    if(!obesityBase) miss.push('BMI／肥満関連健康障害数');
+    if(!anyInsDx) miss.push('高血圧・脂質異常症・2型糖尿病のいずれかの診断');
+    if(!dietFailure) miss.push('食事療法・運動療法で効果不十分');
+    if(!drugProgram) miss.push('投与施設で6か月以上の食事・運動療法＋栄養指導');
+    if(!anyInsMed) miss.push('高血圧・脂質異常・2型糖尿病のいずれかへの薬物療法');
+    if(miss.length) return {ok:false, message:`この入力内容では${type==='wegovy_obesity'?'ウゴービ':'ゼップバウンド'}（肥満症）の主要な投与条件を満たしていないため、投与終了日は計算しません。未充足／未確認：${miss.join('、')}`};
+    return {ok:true};
+  }
+
+  if(type==='zep_osas'){
+    const miss=[];
+    const o=osasDiagnosticState();
+    if(o.status!=='yes') miss.push('OSAS／肥満低換気症候群「あり」');
+    if(o.status==='yes' && o.method==='none') miss.push('PSGまたはOCSTの選択');
+    if(o.status==='yes' && o.method!=='none' && o.idx==null) miss.push(`${o.method==='ocst'?'REI':'AHI'}の入力`);
+    if(o.status==='yes' && o.symptomRequired && o.symptoms==='unknown') miss.push('OSAS関連症状の確認（AHI／REI 5以上15未満）');
+    if(o.status==='yes' && o.requiredComplete && !o.diagnosisOk && !(o.symptomRequired && o.symptoms==='unknown')) miss.push(o.idx<5?'OSASの診断内容確認（AHI／REI 5未満）':'OSASの診断内容確認（AHI／REI 5以上15未満＋症状なし）');
+    if(b<27) miss.push('BMI 27以上');
+    if(o.diagnosisOk && !o.zepboundIndexOk) miss.push(o.method==='ocst'?'REI 30以上':'PSG AHI 15以上');
+    if(!(yes('osas3m')||yes('osasException'))) miss.push('3か月の減量療法＋栄養指導、または例外条件');
+    if(miss.length) return {ok:false, message:`この入力内容ではゼップバウンド（OSAS）の主要な投与条件を満たしていないため、投与終了日は計算しません。未充足／未確認：${miss.join('、')}`};
+    return {ok:true};
+  }
+
+  if(type==='wegovy_mash'){
+    const miss=[];
+    if($('mash').value!=='yes') miss.push('MASH「あり」');
+    if($('cirrhosis').value!=='no') miss.push('肝硬変なしの確認');
+    const fib=$('fibrosis').value;
+    if(!(fib==='F2'||fib==='F3')) miss.push('F2またはF3');
+    const method=$('fibrosisMethod').value;
+    const methodOk=method==='biopsy' || (method==='nit' && yes('nitSpecialist'));
+    if(!methodOk) miss.push('肝生検またはNIT＋専門医総合判断');
+    if(b<19) miss.push('BMI 19以上');
+    if(miss.length) return {ok:false, message:`この入力内容ではウゴービ（MASH）の主要な投与条件を満たしていないため、再評価日は計算しません。未充足／未確認：${miss.join('、')}`};
+    return {ok:true};
+  }
+
+  if(type==='mounjaro' || type==='ozempic'){
+    if(!dm) return {ok:false, message:`この入力内容では${type==='mounjaro'?'マンジャロ':'オゼンピック'}を2型糖尿病治療薬として投与する前提を満たしていないため、投与期間は表示しません。`};
+    return {ok:true};
+  }
+  return {ok:true};
+}
+
+function updateDuration(){
+  const type=$('durationDrug').value, d=parseDateLocal($('startDate').value), out=$('durationOutput');
+  if(!d){ out.innerHTML='製剤・適応と使用開始日を入力すると、投与上限到達日または再評価日を表示します。'; return; }
+
+  const eligibility=durationEligibility(type);
+  if(!eligibility.ok){
+    out.innerHTML=`<strong style="color:#b91c1c">⚠ 投与条件を満たしていません</strong><br>${eligibility.message}`;
+    return;
+  }
+
+  const map={
+    wegovy_obesity:{name:'ウゴービ（肥満症）',weeks:68},
+    zep_obesity:{name:'ゼップバウンド（肥満症）',weeks:72},
+    zep_osas:{name:'ゼップバウンド（OSAS）',weeks:52}
+  };
+  if(map[type]){
+    const x=map[type];
+    const lastDose=addDays(d,(x.weeks-1)*7);
+    const limitDate=addDays(d,x.weeks*7);
+    out.innerHTML=`<strong>${x.name}</strong><br>`+
+      `<span class="duration-date">最終投与日の目安：${formatDate(lastDose)}</span><br>`+
+      `週1回を開始日に第1回投与として連続投与する場合、${x.weeks}回目（第${x.weeks-1}週）の投与日に相当します。<br>`+
+      `<strong>${x.weeks}週到達日：${formatDate(limitDate)}</strong><br>`+
+      `「最大${x.weeks}週間」は${x.weeks}週到達日までに投与を終了する趣旨として計算しています。${x.weeks}週到達日に新たに週1回投与を行うと開始日を含めて${x.weeks+1}回目となるため、本ツールでは最終投与日にはしていません。`;
+  } else if(type==='wegovy_mash'){
+    const r=addMonths(d,12); out.innerHTML=`<strong>ウゴービ（MASH）</strong><br><span class="duration-date">${formatDate(r)}</span><br>開始12か月後の再評価目安日です。固定された投与期間上限はなく、継続する場合はその後も12か月ごとを目安に再評価します。`;
+  } else {
+    const name=type==='mounjaro'?'マンジャロ（2型糖尿病）':'オゼンピック（2型糖尿病）';
+    out.innerHTML=`<strong>${name}</strong><br><span class="duration-date">固定上限なし</span><br>肥満症薬の68/72週のような投与期間上限はこの適応には設定されていません。治療継続は糖尿病治療として個別に判断します。`;
+  }
+}
+
+function resetAll(){
+  qsa('input').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio')el.checked=false; else el.value=''; });
+  qsa('select').forEach(el=>el.selectedIndex=0);
+  $('resultsCard').classList.add('hidden'); $('resultList').innerHTML='';
+  updateBmi(); updateConditional(); updateDuration(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+['height','weight'].forEach(id=>$(id).addEventListener('input',updateBmi));
+['dm','igt','ht','dl','osasStatus','fibrosisMethod'].forEach(id=>$(id).addEventListener('change',updateConditional));
+$('sleepTest').addEventListener('change',()=>{ $('sleepIndex').value=''; $('osasSymptoms').value='unknown'; updateConditional(); updateDuration(); });
+$('sleepIndex').addEventListener('input',()=>{ updateConditional(); updateDuration(); });
+$('osasSymptoms').addEventListener('change',()=>{ updateOsasDiagnosticMessage(); updateHealthCount(); updateDuration(); });
+$('mash').addEventListener('change',()=>{ $('c_nafld').checked=$('mash').value==='yes'; updateConditional(); });
+['fpg','ogtt2h','igtA1c'].forEach(id=>$(id).addEventListener('input',updateIgtCriteria));
+$('diabeticRange').addEventListener('change',updateIgtCriteria);
+qsa('#c_ua,#c_cad,#c_stroke,#c_nafld,#c_menses,#c_ms,#c_kidney').forEach(el=>el.addEventListener('change',updateHealthCount));
+$('durationDrug').addEventListener('change',updateDuration); $('startDate').addEventListener('change',updateDuration);
+$('judgeBtn').addEventListener('click',judge); $('resetBtn').addEventListener('click',resetAll);
+document.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.target.closest('details')) judge(); });
+updateBmi(); updateConditional(); updateDuration();
+</script>
+
+<script>
+(function(){
+  const EXPECTED = '© 2026 大平征宏';
+  const AFFILIATION = '東邦大学医療センター大橋病院 糖尿病・代謝・内分泌内科';
+  const LICENSELINE = 'Licensed under CC BY-NC-ND 4.0';
+  const LICENSE1 = 'Creative Commons 表示—非営利—改変禁止 4.0 国際（CC BY-NC-ND 4.0）';
+  const LICENSE2 = '非営利目的で、内容を改変せずに複製・再配布できます。';
+  function lockTool(){
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#fef2f2;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;">
+        <div style="max-width:720px;width:100%;background:white;border:2px solid #b91c1c;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(0,0,0,.08);text-align:center;">
+          <div style="font-size:42px;margin-bottom:12px;">⚠️</div>
+          <h1 style="font-size:24px;color:#991b1b;margin:0 0 14px;">このツールは使用できません</h1>
+          <p style="font-size:16px;line-height:1.8;color:#374151;margin:0;">著作権表示または利用条件の改変を検出しました。<br>正規のファイルをご使用ください。</p>
+        </div>
+      </div>`;
+  }
+  function verify(){
+    const sig = document.getElementById('copyright-signature');
+    const affiliation = document.getElementById('copyright-affiliation');
+    const licenseLine = document.getElementById('copyright-license-line');
+    const bodyText = document.body ? document.body.innerText : '';
+    const lic = document.getElementById('cc-license-notice');
+    if(!sig || sig.textContent.trim() !== EXPECTED || !affiliation || affiliation.textContent.trim() !== AFFILIATION || !licenseLine || licenseLine.textContent.trim() !== LICENSELINE || !lic || !bodyText.includes(LICENSE1) || !bodyText.includes(LICENSE2)){
+      lockTool();
+      return false;
+    }
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    if(!verify()) return;
+    const target = document.body;
+    const obs = new MutationObserver(function(){ verify(); });
+    obs.observe(target,{subtree:true,childList:true,characterData:true});
+    setInterval(verify,1500);
+  });
+})();
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (err) { console.log('SW registration failed:', err); });
+  });
+}
+</script>
+</body>
+</html>
