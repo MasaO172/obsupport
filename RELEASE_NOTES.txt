@@ -6,3 +6,9 @@ Obsupport.2 PWA release — 2026-09-04
 - AHI/REI 5未満、または5以上15未満＋症状なしは肥満関連健康障害・手術合併症にカウントしない。
 - ゼップバウンドOSAS独立適応はPSG AHI 15以上 / OCST REI 30以上を別判定。
 - CPAP/PAP治療中の扱い、MASHと脂肪性肝疾患の連動を維持。
+
+
+2026-09-07 update:
+- Added PDF manual links in the application.
+- docs/device-manual.pdf = 端末別利用マニュアル
+- docs/user-guide.pdf = Obsupport.2 使用説明書

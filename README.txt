@@ -7,3 +7,9 @@
 
 
 2026-09-04: BMIは小数第2位以下を切り捨て、小数1位で表示・判定する方式に変更。
+
+
+2026-09-07 update:
+- Added PDF manual links in the application.
+- docs/device-manual.pdf = 端末別利用マニュアル
+- docs/user-guide.pdf = Obsupport.2 使用説明書

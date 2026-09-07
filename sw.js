@@ -1,4 +1,4 @@
-const CACHE_NAME = 'obsupport-pwa-20260904-osas-symptom-v7';
+const CACHE_NAME = 'obsupport-pwa-20260907-manuals-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,7 +7,9 @@ const APP_SHELL = [
   './apple-touch-icon.png',
   './icon-192.png',
   './icon-512.png',
-  './maskable-512.png'
+  './maskable-512.png',
+  './docs/device-manual.pdf',
+  './docs/user-guide.pdf'
 ];
 
 self.addEventListener('install', function(event) {
