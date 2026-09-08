@@ -1,4 +1,4 @@
-const CACHE_NAME = 'obsupport-pwa-20260908-manual-pages-v11';
+const CACHE_NAME = 'obsupport-pwa-20260908-sophia-v12';
 const APP_SHELL = [
   './',
   './index.html',

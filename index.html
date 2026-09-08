@@ -122,6 +122,16 @@ details .details-body{padding:0 12px 12px;font-size:12px;color:var(--sub)}
 .copyright-footer strong{color:#374151}
 
 hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
+
+.sophia-card{border:2px solid #c7d7ef;background:#f8fbff}
+.sophia-card .card-hd{color:#173b68}
+.sophia-card p{font-size:14px;line-height:1.75;color:#42566a;margin:8px 0}
+.sophia-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.sophia-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:10px;padding:11px 16px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:800;cursor:pointer;text-decoration:none}
+.sophia-btn:hover{filter:brightness(.96)}
+.sophia-btn:disabled{background:#94a3b8;color:#f8fafc;cursor:not-allowed;filter:none}
+.sophia-status{font-size:12.5px;line-height:1.5;color:#64748b}
+.sophia-status.offline{color:#b45309;font-weight:750}
 @media(max-width:680px){
   .wrap{padding:15px 10px 40px}
   .card{padding:16px 13px;border-radius:13px}
@@ -388,10 +398,21 @@ body.manual-open{overflow:hidden;position:fixed;width:100%}
   <p class="small">「最大○週間」は開始日からの<strong>上限到達日</strong>を表示しています。週1回製剤の実際の最終投与日は、投与曜日・中止計画・休薬等により調整してください。</p>
 </div>
 
+<div class="card sophia-card hidden" id="sophiaCard">
+  <div class="card-hd">術後体重軌跡予測（SOPHIA）</div>
+  <p><strong>腹腔鏡下スリーブ状胃切除術（Sleeve gastrectomy）が手術候補となった場合のみ、参考情報として表示します。</strong></p>
+  <p>SOPHIAはUniversité de Lille等が公開している外部の術後体重軌跡予測ツールです。本ツールでは予測アルゴリズムを内蔵せず、公式サイトへのリンクのみを案内します。</p>
+  <p class="small">※この案内は<strong>Sleeve gastrectomy（SG）のみ</strong>を対象としています。腹腔鏡下スリーブ・バイパス術はこの案内の対象外です。SOPHIAの予測結果は術後経過を保証するものではなく、術式決定や手術適応の最終判断を行うものではありません。</p>
+  <div class="sophia-actions">
+    <button class="sophia-btn" id="sophiaBtn" type="button">SOPHIA公式予測ツールを開く ↗</button>
+    <span class="sophia-status" id="sophiaStatus">インターネット接続時のみ利用できます。</span>
+  </div>
+</div>
+
 <div class="card">
   <div class="card-hd">プライバシー・オフライン動作</div>
   <p class="note"><strong>患者データは保存・送信しません。</strong>入力された身長・体重・検査値・合併症等の情報は、判定のために端末内のメモリ上で一時的に処理されるだけで、端末・ブラウザの保存領域やファイルへの保存、外部サーバーへの送信、解析・広告目的の収集、第三者への共有は行いません。ページを閉じる、または入力をリセットすると、入力内容を再利用する機能はありません。</p>
-  <p class="note">判定機能はインターネット接続なしで使用できます。基準・参考資料の外部リンクを開く場合のみ通信が必要です。</p>
+  <p class="note">判定機能はインターネット接続なしで使用できます。基準・参考資料およびSOPHIA公式予測ツールなどの外部リンクを開く場合のみ通信が必要です。</p>
 </div>
 
 <div class="card sources">
@@ -710,6 +731,7 @@ function judge(){
   } else addResult(results,'ウゴービ（MASH）','pending','未判定（なし／未評価）','MASH「あり」を選択すると、非肝硬変・F2/F3・判定法・BMIを確認します。');
 
   renderResults(results);
+  updateSophiaCard(sleeve);
   // 再判定時に投与期間欄も現在の適応条件で必ず再評価する。
   // 以前に算出した投与期間が、適応消失後も残ることを防ぐ。
   updateDuration();
@@ -827,10 +849,36 @@ function updateDuration(){
   }
 }
 
+const SOPHIA_URL='https://bariatric-weight-trajectory-prediction.univ-lille.fr/';
+let sophiaEligible=false;
+
+function updateSophiaOnlineState(){
+  const btn=$('sophiaBtn'), status=$('sophiaStatus');
+  if(!btn||!status) return;
+  const online=navigator.onLine;
+  btn.disabled=!online;
+  status.textContent=online?'外部サイトを開きます。入力内容はObsupport.2から自動送信されません。':'オフラインです。SOPHIA公式サイトはインターネット接続時のみ利用できます。';
+  status.classList.toggle('offline',!online);
+}
+
+function updateSophiaCard(show){
+  sophiaEligible=!!show;
+  const card=$('sophiaCard');
+  if(!card) return;
+  card.classList.toggle('hidden',!sophiaEligible);
+  if(sophiaEligible) updateSophiaOnlineState();
+}
+
+function openSophia(){
+  if(!navigator.onLine){ updateSophiaOnlineState(); return; }
+  window.open(SOPHIA_URL,'_blank','noopener');
+}
+
 function resetAll(){
   qsa('input').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio')el.checked=false; else el.value=''; });
   qsa('select').forEach(el=>el.selectedIndex=0);
   $('resultsCard').classList.add('hidden'); $('resultList').innerHTML='';
+  updateSophiaCard(false);
   updateBmi(); updateConditional(); updateDuration(); window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -844,9 +892,12 @@ $('mash').addEventListener('change',()=>{ $('c_nafld').checked=$('mash').value==
 $('diabeticRange').addEventListener('change',updateIgtCriteria);
 qsa('#c_ua,#c_cad,#c_stroke,#c_nafld,#c_menses,#c_ms,#c_kidney').forEach(el=>el.addEventListener('change',updateHealthCount));
 $('durationDrug').addEventListener('change',updateDuration); $('startDate').addEventListener('change',updateDuration);
+$('sophiaBtn').addEventListener('click',openSophia);
+window.addEventListener('online',updateSophiaOnlineState);
+window.addEventListener('offline',updateSophiaOnlineState);
 $('judgeBtn').addEventListener('click',judge); $('resetBtn').addEventListener('click',resetAll);
 document.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.target.closest('details')) judge(); });
-updateBmi(); updateConditional(); updateDuration();
+updateBmi(); updateConditional(); updateDuration(); updateSophiaCard(false);
 </script>
 
 <script>

@@ -27,3 +27,9 @@ Obsupport.2 PWA release — 2026-09-04
 - Persistent “← ツールに戻る” button retained; input state is preserved when returning.
 - Original PDF files remain included under docs/.
 - Service worker cache updated for v11.
+
+[2026-09-08 v12]
+- Added an online-only external link card to the official SOPHIA postoperative weight trajectory prediction tool.
+- The SOPHIA card appears only when laparoscopic sleeve gastrectomy (Sleeve gastrectomy) meets this tool's candidate criteria.
+- Sleeve-bypass surgery is explicitly excluded from this SOPHIA guidance.
+- No patient data are sent automatically to SOPHIA; users enter data on the external site themselves.
