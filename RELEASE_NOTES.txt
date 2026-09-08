@@ -21,3 +21,9 @@ Obsupport.2 PWA release — 2026-09-04
 - Smartphone manual PDFs now open inside the tool in a full-screen viewer with a persistent 「← ツールに戻る」 button.
 - Returning from a manual keeps current inputs on screen.
 - Service worker cache version updated.
+
+[2026-09-08 v11]
+- Smartphone manual viewer changed from embedded PDF iframe to vertically scrollable page images.
+- Persistent “← ツールに戻る” button retained; input state is preserved when returning.
+- Original PDF files remain included under docs/.
+- Service worker cache updated for v11.

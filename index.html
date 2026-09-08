@@ -146,9 +146,11 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
 .manual-modal-title{font-weight:850;color:var(--primary-dk);font-size:15px;line-height:1.35;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .manual-close{appearance:none;border:0;border-radius:9px;background:var(--primary);color:#fff;font-size:14px;font-weight:850;padding:9px 13px;cursor:pointer;white-space:nowrap}
 .manual-close:active{transform:translateY(1px)}
-.manual-frame{flex:1 1 auto;width:100%;border:0;background:#fff;min-height:0}
+.manual-scroll{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;background:#dfe7ed;padding:10px 8px 16px;box-sizing:border-box;overscroll-behavior:contain}
+.manual-page{display:block;width:100%;max-width:900px;height:auto;margin:0 auto 12px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.14);border-radius:4px}
+.manual-page-label{display:block;max-width:900px;margin:0 auto 5px;text-align:center;font-size:11px;font-weight:700;color:#52606d}
 .manual-modal-note{flex:0 0 auto;margin:0;padding:7px 12px calc(7px + env(safe-area-inset-bottom));font-size:11px;line-height:1.5;color:#52606d;background:#fff;border-top:1px solid #e2e8f0;text-align:center}
-body.manual-open{overflow:hidden}
+body.manual-open{overflow:hidden;position:fixed;width:100%}
 
 </style>
 
@@ -163,7 +165,7 @@ body.manual-open{overflow:hidden}
   <div class="badge">医療者向け・判定補助</div>
   <h1>肥満症治療選択サポート</h1>
   <p class="subtitle">BMI・合併症・糖代謝・OSAS・MASHから、手術／注射製剤の基準上の候補を整理します。</p>
-  <span class="version">Obsupport.2　｜　最終更新日：2026年9月7日　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
+  <span class="version">Obsupport.2　｜　最終更新日：2026年9月8日　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
 </header>
 
 <div class="copyright-banner" role="note" aria-label="著作権・Creative Commonsライセンス">
@@ -193,10 +195,10 @@ body.manual-open{overflow:hidden}
 
 <div class="manual-panel" role="note" aria-label="利用マニュアル・使用説明書">
   <strong>利用マニュアル・使用説明書</strong>
-  <p>初めて利用する方は、端末への追加方法と本ツールの使い方をPDFで確認できます。</p>
+  <p>初めて利用する方は、端末への追加方法と本ツールの使い方を画面内で確認できます。</p>
   <div class="manual-links">
-    <a class="manual-link" href="docs/device-manual.pdf" data-manual-title="端末別利用マニュアル" data-manual-pdf="docs/device-manual.pdf">📱 端末別利用マニュアル（PDF）</a>
-    <a class="manual-link" href="docs/user-guide.pdf" data-manual-title="Obsupport.2 使用説明書" data-manual-pdf="docs/user-guide.pdf">📖 Obsupport.2 使用説明書（PDF）</a>
+    <a class="manual-link" href="docs/device-manual.pdf" data-manual-title="端末別利用マニュアル" data-manual-prefix="manual-pages/device/page-" data-manual-pages="5">📱 端末別利用マニュアル</a>
+    <a class="manual-link" href="docs/user-guide.pdf" data-manual-title="Obsupport.2 使用説明書" data-manual-prefix="manual-pages/guide/page-" data-manual-pages="6">📖 Obsupport.2 使用説明書</a>
   </div>
 </div>
 
@@ -205,8 +207,8 @@ body.manual-open{overflow:hidden}
     <button type="button" id="manualCloseBtn" class="manual-close">← ツールに戻る</button>
     <div id="manualModalTitle" class="manual-modal-title">マニュアル</div>
   </div>
-  <iframe id="manualFrame" class="manual-frame" title="マニュアルPDF"></iframe>
-  <p class="manual-modal-note">PDFを閉じるときは、上の「← ツールに戻る」を押してください。入力内容を保持したまま判定画面に戻ります。</p>
+  <div id="manualScroll" class="manual-scroll" role="document" aria-label="マニュアル本文"></div>
+  <p class="manual-modal-note">上下にスクロールして閲覧できます。閉じるときは、上の「← ツールに戻る」を押してください。入力内容を保持したまま判定画面に戻ります。</p>
 </div>
 
 <div class="card">
@@ -415,7 +417,7 @@ body.manual-open{overflow:hidden}
   <strong>© 2026 大平征宏</strong><br>
   東邦大学医療センター大橋病院 糖尿病・代謝・内分泌内科<br>
   <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja" target="_blank" rel="noopener">Licensed under CC BY-NC-ND 4.0</a><br>
-  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　最終更新日：2026年9月7日
+  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　最終更新日：2026年9月8日
 </div>
 
 <script>
@@ -889,28 +891,49 @@ updateBmi(); updateConditional(); updateDuration();
 
 <script>
 (function(){
+  var savedScrollY=0;
   function openManual(link){
     var modal=document.getElementById('manualModal');
-    var frame=document.getElementById('manualFrame');
+    var scroller=document.getElementById('manualScroll');
     var title=document.getElementById('manualModalTitle');
-    if(!modal||!frame) return;
+    if(!modal||!scroller) return;
     title.textContent=link.getAttribute('data-manual-title')||'マニュアル';
-    frame.src=link.getAttribute('data-manual-pdf')||link.getAttribute('href');
+    var prefix=link.getAttribute('data-manual-prefix')||'';
+    var pages=parseInt(link.getAttribute('data-manual-pages')||'0',10);
+    scroller.innerHTML='';
+    for(var i=1;i<=pages;i++){
+      var label=document.createElement('span');
+      label.className='manual-page-label';
+      label.textContent=i+' / '+pages;
+      var img=document.createElement('img');
+      img.className='manual-page';
+      img.src=prefix+i+'.png';
+      img.alt=(title.textContent||'マニュアル')+' '+i+'ページ';
+      img.loading=(i===1)?'eager':'lazy';
+      img.decoding='async';
+      scroller.appendChild(label);
+      scroller.appendChild(img);
+    }
+    savedScrollY=window.pageYOffset||document.documentElement.scrollTop||0;
     modal.classList.add('open');
     document.body.classList.add('manual-open');
+    document.body.style.top=(-savedScrollY)+'px';
+    scroller.scrollTop=0;
     var close=document.getElementById('manualCloseBtn');
     if(close) close.focus();
   }
   function closeManual(){
     var modal=document.getElementById('manualModal');
-    var frame=document.getElementById('manualFrame');
-    if(!modal||!frame) return;
+    var scroller=document.getElementById('manualScroll');
+    if(!modal||!scroller) return;
     modal.classList.remove('open');
     document.body.classList.remove('manual-open');
-    frame.src='about:blank';
+    document.body.style.top='';
+    scroller.innerHTML='';
+    window.scrollTo(0,savedScrollY);
   }
   document.addEventListener('DOMContentLoaded',function(){
-    var links=document.querySelectorAll('[data-manual-pdf]');
+    var links=document.querySelectorAll('[data-manual-prefix]');
     for(var i=0;i<links.length;i++){
       links[i].addEventListener('click',function(e){e.preventDefault();openManual(this);});
     }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'obsupport-pwa-20260908-manual-viewer-v10';
+const CACHE_NAME = 'obsupport-pwa-20260908-manual-pages-v11';
 const APP_SHELL = [
   './',
   './index.html',
@@ -9,7 +9,18 @@ const APP_SHELL = [
   './icon-512.png',
   './maskable-512.png',
   './docs/device-manual.pdf',
-  './docs/user-guide.pdf'
+  './docs/user-guide.pdf',
+  './manual-pages/device/page-1.png',
+  './manual-pages/device/page-2.png',
+  './manual-pages/device/page-3.png',
+  './manual-pages/device/page-4.png',
+  './manual-pages/device/page-5.png',
+  './manual-pages/guide/page-1.png',
+  './manual-pages/guide/page-2.png',
+  './manual-pages/guide/page-3.png',
+  './manual-pages/guide/page-4.png',
+  './manual-pages/guide/page-5.png',
+  './manual-pages/guide/page-6.png'
 ];
 
 self.addEventListener('install', function(event) {
