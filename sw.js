@@ -1,4 +1,4 @@
-const CACHE_NAME = 'obsupport-pwa-20260907-manuals-v9-masao172';
+const CACHE_NAME = 'obsupport-pwa-20260908-manual-viewer-v10';
 const APP_SHELL = [
   './',
   './index.html',

@@ -139,6 +139,17 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
   body{background:#fff}.wrap{max-width:none}.action-bar{display:none}.card{box-shadow:none;break-inside:avoid}
   details{display:block}details .details-body{display:block}
 }
+
+.manual-modal{position:fixed;inset:0;z-index:9999;background:#eef4f8;display:none;flex-direction:column;width:100%;height:100vh;height:100dvh}
+.manual-modal.open{display:flex}
+.manual-modal-bar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-bottom:1px solid #cbd5e1;box-shadow:0 2px 8px rgba(0,0,0,.08);padding-top:max(10px,env(safe-area-inset-top))}
+.manual-modal-title{font-weight:850;color:var(--primary-dk);font-size:15px;line-height:1.35;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.manual-close{appearance:none;border:0;border-radius:9px;background:var(--primary);color:#fff;font-size:14px;font-weight:850;padding:9px 13px;cursor:pointer;white-space:nowrap}
+.manual-close:active{transform:translateY(1px)}
+.manual-frame{flex:1 1 auto;width:100%;border:0;background:#fff;min-height:0}
+.manual-modal-note{flex:0 0 auto;margin:0;padding:7px 12px calc(7px + env(safe-area-inset-bottom));font-size:11px;line-height:1.5;color:#52606d;background:#fff;border-top:1px solid #e2e8f0;text-align:center}
+body.manual-open{overflow:hidden}
+
 </style>
 
 <meta name="theme-color" content="#165c8d">
@@ -184,9 +195,18 @@ hr.sep{border:0;border-top:1px solid var(--border);margin:16px 0}
   <strong>利用マニュアル・使用説明書</strong>
   <p>初めて利用する方は、端末への追加方法と本ツールの使い方をPDFで確認できます。</p>
   <div class="manual-links">
-    <a class="manual-link" href="docs/device-manual.pdf" target="_blank" rel="noopener">📱 端末別利用マニュアル（PDF）</a>
-    <a class="manual-link" href="docs/user-guide.pdf" target="_blank" rel="noopener">📖 Obsupport.2 使用説明書（PDF）</a>
+    <a class="manual-link" href="docs/device-manual.pdf" data-manual-title="端末別利用マニュアル" data-manual-pdf="docs/device-manual.pdf">📱 端末別利用マニュアル（PDF）</a>
+    <a class="manual-link" href="docs/user-guide.pdf" data-manual-title="Obsupport.2 使用説明書" data-manual-pdf="docs/user-guide.pdf">📖 Obsupport.2 使用説明書（PDF）</a>
   </div>
+</div>
+
+<div id="manualModal" class="manual-modal" role="dialog" aria-modal="true" aria-label="マニュアル表示">
+  <div class="manual-modal-bar">
+    <button type="button" id="manualCloseBtn" class="manual-close">← ツールに戻る</button>
+    <div id="manualModalTitle" class="manual-modal-title">マニュアル</div>
+  </div>
+  <iframe id="manualFrame" class="manual-frame" title="マニュアルPDF"></iframe>
+  <p class="manual-modal-note">PDFを閉じるときは、上の「← ツールに戻る」を押してください。入力内容を保持したまま判定画面に戻ります。</p>
 </div>
 
 <div class="card">
@@ -866,6 +886,40 @@ updateBmi(); updateConditional(); updateDuration();
 })();
 </script>
 
+
+<script>
+(function(){
+  function openManual(link){
+    var modal=document.getElementById('manualModal');
+    var frame=document.getElementById('manualFrame');
+    var title=document.getElementById('manualModalTitle');
+    if(!modal||!frame) return;
+    title.textContent=link.getAttribute('data-manual-title')||'マニュアル';
+    frame.src=link.getAttribute('data-manual-pdf')||link.getAttribute('href');
+    modal.classList.add('open');
+    document.body.classList.add('manual-open');
+    var close=document.getElementById('manualCloseBtn');
+    if(close) close.focus();
+  }
+  function closeManual(){
+    var modal=document.getElementById('manualModal');
+    var frame=document.getElementById('manualFrame');
+    if(!modal||!frame) return;
+    modal.classList.remove('open');
+    document.body.classList.remove('manual-open');
+    frame.src='about:blank';
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    var links=document.querySelectorAll('[data-manual-pdf]');
+    for(var i=0;i<links.length;i++){
+      links[i].addEventListener('click',function(e){e.preventDefault();openManual(this);});
+    }
+    var close=document.getElementById('manualCloseBtn');
+    if(close) close.addEventListener('click',closeManual);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape') closeManual();});
+  });
+})();
+</script>
 
 <script>
 if ('serviceWorker' in navigator) {
