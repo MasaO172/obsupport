@@ -33,3 +33,7 @@ Obsupport.2 PWA release — 2026-09-04
 - The SOPHIA card appears only when laparoscopic sleeve gastrectomy (Sleeve gastrectomy) meets this tool's candidate criteria.
 - Sleeve-bypass surgery is explicitly excluded from this SOPHIA guidance.
 - No patient data are sent automatically to SOPHIA; users enter data on the external site themselves.
+
+[2026-09-08 v13]
+- SOPHIA guidance moved into the green sleeve gastrectomy candidate result block.
+- Separate SOPHIA card below injection-duration section removed.
