@@ -1,4 +1,4 @@
-const CACHE_NAME = 'obsupport-pwa-20261004-sleeve-r8-v15';
+const CACHE_NAME = 'obsupport-pwa-20261004-sleeve-r8-v16';
 const APP_SHELL = [
   './',
   './index.html',

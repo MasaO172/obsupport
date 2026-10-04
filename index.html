@@ -180,7 +180,7 @@ body.manual-open{overflow:hidden;position:fixed;width:100%}
   <div class="badge">医療者向け・判定補助</div>
   <h1>肥満症治療選択サポート</h1>
   <p class="subtitle">BMI・合併症・糖代謝・OSAS・MASHから、手術／注射製剤の基準上の候補を整理します。</p>
-  <span class="version">Obsupport.2　｜　最終更新日：2026年10月4日　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
+  <span class="version">Obsupport.2　｜　更新版 v16（2026年10月4日）　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
 </header>
 
 <div class="copyright-banner" role="note" aria-label="著作権・Creative Commonsライセンス">
@@ -432,7 +432,7 @@ body.manual-open{overflow:hidden;position:fixed;width:100%}
   <strong>© 2026 大平征宏</strong><br>
   東邦大学医療センター大橋病院 糖尿病・代謝・内分泌内科<br>
   <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja" target="_blank" rel="noopener">Licensed under CC BY-NC-ND 4.0</a><br>
-  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　最終更新日：2026年10月4日
+  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　更新版 v16（2026年10月4日）
 </div>
 
 <script>
@@ -658,14 +658,28 @@ function judge(){
   }
 
   // Surgery
-  const sleeveAnatomic=(b>=35 && (dm||ht||dl||osas||nafld)) || (b>=32 && b<35 && (severeDmForSurgery || surgeryComorbidityCount>=2));
+  // 令和8年度 K656-2：
+  // BMI 32.0～34.9では、
+  //   A) HbA1c 8.0%以上（NGSP値）の糖尿病 → 単独で合併症条件を満たす
+  //   B) それ以外 → 高血圧・脂質異常症・OSAS・脂肪性肝疾患のうち2つ以上
+  // のいずれか。6か月以上の内科的治療抵抗性は別途必須。
+  let sleeveAnatomic=false;
+  if(b>=35){
+    sleeveAnatomic=(dm||ht||dl||osas||nafld);
+  } else if(b>=32 && b<35){
+    if(severeDmForSurgery){
+      sleeveAnatomic=true;
+    } else if(surgeryComorbidityCount>=2){
+      sleeveAnatomic=true;
+    }
+  }
   const sleeve=sleeveAnatomic && surgery6m;
   if(sleeve){
     let why;
     if(b>=35){
       why='BMI 35以上＋対象合併症1つ以上';
     } else if(severeDmForSurgery) {
-      why='BMI 32～34.9＋HbA1c 8.0%以上（NGSP値）の糖尿病';
+      why='BMI 32～34.9＋HbA1c 8.0%以上（NGSP値）の糖尿病（この分岐では他の対象合併症は不要）';
     } else {
       const qualifying=[];
       if(ht) qualifying.push('高血圧');
