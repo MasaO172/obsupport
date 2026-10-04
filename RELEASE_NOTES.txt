@@ -37,3 +37,13 @@ Obsupport.2 PWA release — 2026-09-04
 [2026-09-08 v13]
 - SOPHIA guidance moved into the green sleeve gastrectomy candidate result block.
 - Separate SOPHIA card below injection-duration section removed.
+
+2026-10-04 v14
+- 令和8年度 K656-2 のBMI 32～34.9における腹腔鏡下スリーブ状胃切除術の算定ロジックを修正。
+- HbA1c 8.0%以上（NGSP値）の糖尿病は、他の対象合併症を伴わなくても主要な算定条件を満たすよう変更。
+- もう一方の経路は、高血圧症・脂質異常症・OSAS・脂肪性肝疾患のうち2つ以上。
+- 厚生労働省の令和8年度資料への参照リンクを更新。
+
+2026-10-04 v15
+- 厚生労働省「令和8年度 医科診療報酬点数表に関する事項」K656-2 のリンク切れを修正。
+- 現行PDF（https://www.mhlw.go.jp/content/12400000/001732089.pdf）へ更新。

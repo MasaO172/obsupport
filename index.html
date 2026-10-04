@@ -180,7 +180,7 @@ body.manual-open{overflow:hidden;position:fixed;width:100%}
   <div class="badge">医療者向け・判定補助</div>
   <h1>肥満症治療選択サポート</h1>
   <p class="subtitle">BMI・合併症・糖代謝・OSAS・MASHから、手術／注射製剤の基準上の候補を整理します。</p>
-  <span class="version">Obsupport.2　｜　最終更新日：2026年9月8日　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
+  <span class="version">Obsupport.2　｜　最終更新日：2026年10月4日　｜　入力内容は保存・送信されず、端末内だけで処理されます</span>
 </header>
 
 <div class="copyright-banner" role="note" aria-label="著作権・Creative Commonsライセンス">
@@ -257,7 +257,7 @@ body.manual-open{overflow:hidden;position:fixed;width:100%}
     <div class="field hidden" id="hba1cWrap">
       <label for="hba1c">HbA1c</label>
       <div class="input-wrap"><input class="unit-pad" id="hba1c" type="number" inputmode="decimal" min="3" max="20" step="0.1" placeholder="例：8.2"><span class="unit">%</span></div>
-      <span class="help">BMI 32～34.9の手術基準判定にも使用します。</span>
+      <span class="help">BMI 32～34.9では、HbA1c 8.0%以上（NGSP値）の糖尿病単独でもスリーブ状胃切除術の保険算定基準を満たし得ます。</span>
     </div>
     <div class="field hidden" id="dmDrugWrap">
       <label for="dmDrug">2型糖尿病に対する薬物療法</label>
@@ -432,7 +432,7 @@ body.manual-open{overflow:hidden;position:fixed;width:100%}
   <strong>© 2026 大平征宏</strong><br>
   東邦大学医療センター大橋病院 糖尿病・代謝・内分泌内科<br>
   <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ja" target="_blank" rel="noopener">Licensed under CC BY-NC-ND 4.0</a><br>
-  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　最終更新日：2026年9月8日
+  非営利・非改変・クレジット表示を条件に複製・再配布可。<br>Obsupport.2　最終更新日：2026年10月4日
 </div>
 
 <script>
@@ -561,7 +561,7 @@ const EVIDENCE = {
   diabetes:{title:'2型糖尿病治療薬としての位置づけ',text:'マンジャロ／オゼンピックは、本ツールでは2型糖尿病がある場合に糖尿病治療薬として候補表示します。肥満症治療薬としての適応を判定する表示ではありません。実際の処方では各製剤の最新添付文書を確認してください。',links:[]},
   obesityDrug:{title:'肥満症：ウゴービ／ゼップバウンド',text:'BMI 35 kg/m²以上、またはBMI 27 kg/m²以上で肥満関連健康障害を2つ以上有することに加え、最適使用推進ガイドライン上の患者選択条件（食事・運動療法、栄養指導、対象疾患への薬物療法等）を確認して判定しています。投与期間はウゴービ最大68週間、ゼップバウンド最大72週間です。',links:[['PMDA：ゼップバウンド添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05'],['PMDA：ゼップバウンド 最適使用推進ガイドライン（肥満症）','https://www.pmda.go.jp/files/000280607.pdf'],['PMDA：ウゴービ添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/620023_2499418G5023_1_07'],['PMDA：ウゴービ 最適使用推進ガイドライン（肥満症）','https://www.pmda.go.jp/files/000281140.pdf']]},
   igt:{title:'ゼップバウンド：耐糖能異常を含む耐糖能障害',text:'ゼップバウンドの肥満症では、承認上の条件として耐糖能障害（2型糖尿病、耐糖能異常等）が含まれます。高血圧・脂質異常症を伴わない耐糖能異常では、入力されたFPG・75gOGTT 2時間値・HbA1c等から追加条件を確認します。本ツールでは承認上の条件と保険給付上の取扱いを分けて表示します。',links:[['PMDA：ゼップバウンド添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05'],['PMDA：ゼップバウンド 最適使用推進ガイドライン（肥満症）','https://www.pmda.go.jp/files/000280607.pdf']]},
-  surgery:{title:'腹腔鏡下胃縮小術の保険算定基準',text:'腹腔鏡下スリーブ状胃切除術および腹腔鏡下スリーブ・バイパス術について、BMI、対象合併症、HbA1c、6か月以上の内科的治療等の入力から、令和8年度診療報酬の主要な算定条件を整理して表示します。実施施設・術前評価等の要件は別途確認が必要です。',links:[['厚生労働省：令和8年度 医科診療報酬点数表に関する事項（K656-2）','https://www.mhlw.go.jp/content/12400000/001732089.pdf']]},
+  surgery:{title:'腹腔鏡下胃縮小術の保険算定基準',text:'令和8年度では、BMI 32～34.9の腹腔鏡下スリーブ状胃切除術は、6か月以上の内科的治療で十分な効果が得られないことに加え、①HbA1c 8.0%以上（NGSP値）の糖尿病、または②高血圧症・脂質異常症・OSAS・脂肪性肝疾患のうち2つ以上、のいずれかで主要な算定条件を満たします。BMI 35以上およびスリーブ・バイパス術は別基準です。実施施設・術前評価等の要件は別途確認が必要です。',links:[['厚生労働省：令和8年度 医科診療報酬点数表に関する事項（K656-2）','https://www.mhlw.go.jp/content/12400000/001732089.pdf']]},
   osas:{title:'ゼップバウンド：OSAS',text:'OSAS「あり」の場合はPSG／OCSTの結果入力を必須とします。本ツールではAHI／REI 15以上、または5以上15未満でOSAS関連症状「あり」の場合にOSASを肥満関連健康障害・手術合併症としてカウントします。AHI／REI 5未満、または5以上15未満で症状なしの場合はカウントしません。ゼップバウンドのOSAS独立適応ではBMI 27 kg/m²以上を前提とし、PSG AHI 15以上またはOCST REI 30以上、さらに事前の減量療法・栄養指導または規定された例外条件を確認します。CPAP／PAP治療中でも対象となり得ます。最大投与期間は52週間です。',links:[['PMDA：ゼップバウンド 最適使用推進ガイドライン（OSAS）','https://www.pmda.go.jp/files/000280608.pdf'],['PMDA：ゼップバウンド添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/530471_2499422G7022_1_05']]},
   mash:{title:'ウゴービ：MASH',text:'MASHの独立適応では、肝硬変を伴わないこと、中等度または高度の肝線維化（F2またはF3）、肝生検または規定されたNITと専門医の総合判断、BMI条件等を確認して判定します。固定された投与期間上限はなく、12か月ごとの再評価を前提とします。',links:[['PMDA：ウゴービ 最適使用推進ガイドライン（MASH）','https://www.pmda.go.jp/files/000281141.pdf'],['PMDA：ウゴービ添付文書','https://www.pmda.go.jp/PmdaSearch/iyakuDetail/620023_2499418G5023_1_07']]}
 };
@@ -608,11 +608,12 @@ function judge(){
   const surgery6m=yes('surgery6m');
   const osasStatus=$('osasStatus').value;
   const osas=s.osas; const nafld=yes('c_nafld');
-  // BMI 32–34.9 のスリーブ手術判定用：
-  // HbA1c 8.0%以上の2型糖尿病を1項目として数え、HT/DL/OSAS/NAFLDと合わせて2項目以上。
+  // BMI 32–34.9 のスリーブ手術判定用（令和8年度）：
+  // ① HbA1c 8.0%以上（NGSP値）の糖尿病は単独で条件を満たす。
+  // ② それ以外は、HT/DL/OSAS/NAFLDのうち2項目以上で条件を満たす。
   // 高尿酸血症など、薬物療法では肥満関連健康障害に含まれる項目でも、ここでは手術基準の項目数に含めない。
   const severeDmForSurgery=(dm && hba1c!=null && hba1c>=8.0);
-  const surgeryRelatedCount=(severeDmForSurgery?1:0)+(ht?1:0)+(dl?1:0)+(osas?1:0)+(nafld?1:0);
+  const surgeryComorbidityCount=(ht?1:0)+(dl?1:0)+(osas?1:0)+(nafld?1:0);
 
   $('rBmi').textContent=b.toFixed(1); $('rCount').textContent=s.count; $('rBase').textContent=obesityBase?'○':'×';
   const results=[];
@@ -657,27 +658,28 @@ function judge(){
   }
 
   // Surgery
-  const sleeveAnatomic=(b>=35 && (dm||ht||dl||osas||nafld)) || (b>=32 && b<35 && surgeryRelatedCount>=2);
+  const sleeveAnatomic=(b>=35 && (dm||ht||dl||osas||nafld)) || (b>=32 && b<35 && (severeDmForSurgery || surgeryComorbidityCount>=2));
   const sleeve=sleeveAnatomic && surgery6m;
   if(sleeve){
     let why;
     if(b>=35){
       why='BMI 35以上＋対象合併症1つ以上';
+    } else if(severeDmForSurgery) {
+      why='BMI 32～34.9＋HbA1c 8.0%以上（NGSP値）の糖尿病';
     } else {
       const qualifying=[];
-      if(severeDmForSurgery) qualifying.push('2型糖尿病（HbA1c 8.0%以上）');
       if(ht) qualifying.push('高血圧');
       if(dl) qualifying.push('脂質異常');
       if(osas) qualifying.push('OSAS');
       if(nafld) qualifying.push('NAFLD/MASLD等');
-      why=`BMI 32～34.9＋手術基準上の対象項目2つ以上（${qualifying.join('、')}）`;
+      why=`BMI 32～34.9＋対象合併症2つ以上（${qualifying.join('、')}）`;
     }
     addResult(results,'腹腔鏡下スリーブ状胃切除術','ok','保険算定基準上の候補',`入力された主要な保険算定基準を満たしています。${why}。6か月以上の内科的治療を継続しても十分な効果が得られないことも確認されています。`,['実施施設・術前評価などの要件を別途確認してください。']);
   } else {
     const miss=[];
     if(!sleeveAnatomic){
       if(b>=32 && b<35){
-        miss.push(`手術基準上の対象項目2つ以上（現在 ${surgeryRelatedCount} 項目）`);
+        miss.push(`HbA1c 8.0%以上（NGSP値）の糖尿病、または高血圧・脂質異常症・OSAS・脂肪性肝疾患のうち2つ以上（現在 ${surgeryComorbidityCount} 項目）`);
       } else {
         miss.push('BMI・対象合併症の組合せ');
       }
